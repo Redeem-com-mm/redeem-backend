@@ -2,56 +2,100 @@ const db = require("../models");
 const Role = db.roles;
 const Op = db.Sequelize.Op;
 const { v4: uuidv4 } = require('uuid');
+const Authentication = require('../services/authentication.js');
 
 // Create and Save a new Role
-exports.create = (req, res) => { 
-  // Validate request
-  if (!req.body.name) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
-    return;
+exports.create = async (req, res) => { 
+  try{
+    let decoded = await Authentication.JwtVerify(req.headers.authorization);
+    if (!decoded) throw {
+      status: 401,
+      message: "Provide Valid JWT Token"
+    }
+
+    // Validate request
+    if (!req.body.name) throw {
+      status: 401,
+      message: "name can not be empty!"
+    }
+  
+    const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+    const currentRole = await roles.findOne(decodedToken.userRole);
+    if(currentRole != null && currentRole.name === "admin" ){
+        // Create a Role
+        const role = {
+          id: uuidv4(),
+          name: req.body.name
+        };
+
+        // Save role in the database
+        await Role.create(role)
+          .then(data => {
+            res.send(data);
+          })
+          .catch(err => {
+            throw {
+              status: 500,
+              message: err.message || "Some error occurred while creating the Role."
+            }
+          });
+    }
+    else{
+      throw {
+        status: 401,
+        message: "Unauthorize Resource"
+      }
+    }
   }
-
-  // Create a Role
-  const role = {
-    id: uuidv4(),
-    name: req.body.name
-  };
-
-  // Save role in the database
-  Role.create(role)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Role."
-      });
-    });
+  catch(e){
+    let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+  }
 };
 
 // Retrieve all Roles from the database.
-exports.findAll = (req, res) => {
-    const title = req.query.title;
-    //var condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+exports.findAll = async (req, res) => {  
+  try{
+    let decoded = await Authentication.JwtVerify(req.headers.authorization);
+    if (!decoded) throw {
+          status: 401,
+          message: "Provide Valid JWT Token"
+    }
   
-    Role.findAll()
+    const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+    const currentRole = await roles.findOne(decodedToken.userRole);
+    if(currentRole != null && currentRole.name === "admin" ){
+      await Role.findAll()
       .then(data => {
         res.send(data);
       })
       .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Some error occurred while retrieving roles."
-        });
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving roles."
+        }
       });
+    }
+    else{
+      throw {
+        status: 401,
+        message: "Unauthorize Resource"
+      }
+    }
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+  }  
 };
 
 // Find a single Role with an name
 exports.findOneByName = async (name) => {
-    var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
+    var condition = name ? { name: name} : null;
     var role = [];
     
     try{
