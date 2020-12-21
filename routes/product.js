@@ -8,6 +8,9 @@ module.exports = app => {
 
     // Retrieve all Products
     router.get("/", products.findAll);
+
+    // Retrieve all Products with Pagination
+    router.get("/:page/:size", products.findAndCountAll);
   
     // Retrieve a single Product with id
     router.get("/:id", products.findOne);

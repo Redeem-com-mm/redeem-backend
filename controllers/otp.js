@@ -30,7 +30,8 @@ exports.sendOtp = async (req, res) => {
         }
 
         res.send({
-            message : "OTP is generated!"
+            message : "OTP is generated!",
+            code : generateOtp
         });
     }
     catch(e){

@@ -13,7 +13,7 @@ exports.create = async (req, res) => {
                 message: "Provide Valid JWT Token"
         }
 
-        if(!req.body.name || !req.body.category_id || !req.body.price || !req.body.sale_price) throw {
+        if(!req.body.name || !req.body.category_id || !req.body.price) throw {
             status: 400,
             message: "Some of required parameters are empty!"
         }
@@ -28,6 +28,10 @@ exports.create = async (req, res) => {
             subCategory.updated_date = Date.now();
             subCategory.created_by = decodedToken.user_id;
             subCategory.updated_by = decodedToken.user_id;
+
+            if(!req.body.sale_price){
+              subCategory.sale_price = subCategory.price;
+            }
 
             await SubCategory.create(subCategory)
             .then(data => {

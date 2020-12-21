@@ -39,6 +39,10 @@ module.exports = (sequelize, Sequelize) => {
         type : Sequelize.STRING,
         allowNull : false
       },
+      is_active : {
+        type : Sequelize.BOOLEAN,
+        defaultValue : false
+      },
       created_date : {
         type : Sequelize.DATE,
         defaultValue: Sequelize.NOW

@@ -43,6 +43,7 @@ exports.create = async (req, res) => {
     user.is_active = true;
     const encryptPassword = Authentication.CryptoEncrypt(req.body.password);
     user.password = encryptPassword;
+    user.updated_date = Date.now();
 
     // Save user in the database
     await User.create(user)

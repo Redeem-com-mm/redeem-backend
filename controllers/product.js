@@ -100,6 +100,53 @@ exports.findAll = async (req, res) => {
   };
 //#endregion
 
+//#region Retrieve all Product with Pagination from the database.
+exports.findAndCountAll = async (req, res) => {  
+  try{
+      let decoded = await Authentication.JwtVerify(req.headers.authorization);
+      if (!decoded) throw {
+            status: 401,
+            message: "Provide Valid JWT Token"
+      }
+
+      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+      const currentRole = await roles.findOne(decodedToken.userRole);
+
+      if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){
+        await Product.findAndCountAll({
+          offset : req.params.page * req.params.size,
+          limit : req.params.size, 
+          // Add order conditions here....
+          order: [
+              ['updated_date', 'DESC']
+          ]
+        })
+        .then(data => {
+          res.send(data);
+        })
+        .catch(err => {
+          throw {
+            status: 500,
+            message: err.message || "Some error occurred while retrieving products."
+          }
+        });
+      }
+      else{
+        throw {
+          status: 401,
+          message: "Unauthorize Resource"
+        }
+      }      
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
 //#region  Find a single Product with an id
 exports.findOne = async (req, res) => {
     try{
