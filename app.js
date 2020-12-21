@@ -17,7 +17,7 @@ db.sequelize.sync();
 //app.use(cors(corsOptions));
 //app.use(morgan('dev'));
 
-app.use(cors);
+app.use(cors());
 morganBody(app);
 
 // parse requests of content-type - application/json
