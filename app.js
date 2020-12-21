@@ -10,13 +10,14 @@ const app = express();
 const db = require("./models");
 db.sequelize.sync();
 
-var corsOptions = {
+/* var corsOptions = {
   origin: "http://localhost:8081"
-};
+}; */
 
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 //app.use(morgan('dev'));
 
+app.use(cors);
 morganBody(app);
 
 // parse requests of content-type - application/json
