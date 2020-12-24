@@ -21,5 +21,8 @@ module.exports = app => {
     // Retrieve all SubCategories By Category Id
     router.get("/bycategory/:id", subcategories.findByCategoryId);
 
+    // Retrieve all SubCategories By Promotion
+    router.get("/all/promotion", subcategories.findByPromotion);
+
     app.use('/api/subcategories', router);
 };
