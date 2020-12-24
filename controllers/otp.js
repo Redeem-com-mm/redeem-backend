@@ -1,6 +1,7 @@
 const db = require("../models");
 const Otp = db.otps;
 var validitySeconds = 180;
+const Authentication = require('../services/authentication.js');
 
 //#region  sendOTP
 exports.sendOtp = async (req, res) => {
@@ -10,29 +11,39 @@ exports.sendOtp = async (req, res) => {
             message: "Phone No is required!"
         }
 
-        var generateOtp = Math.floor(Math.random() * Math.floor(999999));
-        generateOtp = generateOtp.toString().padStart(6, 0);
-        let timestamp = (new Date()).toISOString();
-        const phone_no = req.body.phone_no;
-        var otp = {
-            phone_no : phone_no,
-            otp : generateOtp,
-            created_at : timestamp
-        }
+        const decryptedPhoneNo = Authentication.CryptoDecrypt(req.body.phone_no);
 
-        const otpObj = await Otp.findByPk(phone_no);
-
-        if(otpObj != null){
-            Otp.update(otp, {where : {phone_no : phone_no}});
+        if(!decryptedPhoneNo){
+            throw {
+                status: 401,
+                message: "Unauthorize Resource"
+            }
         }
         else{
-            Otp.create(otp);
-        }
+            var generateOtp = Math.floor(Math.random() * Math.floor(999999));
+            generateOtp = generateOtp.toString().padStart(6, 0);
+            let timestamp = (new Date()).toISOString();
+            const phone_no = req.body.phone_no;
+            var otp = {
+                phone_no : phone_no,
+                otp : generateOtp,
+                created_at : timestamp
+            }
 
-        res.send({
-            message : "OTP is generated!",
-            code : generateOtp
-        });
+            const otpObj = await Otp.findByPk(phone_no);
+
+            if(otpObj != null){
+                Otp.update(otp, {where : {phone_no : phone_no}});
+            }
+            else{
+                Otp.create(otp);
+            }
+
+            res.send({
+                message : "OTP is generated!",
+                code : generateOtp
+            });
+        }
     }
     catch(e){
         let status = e.status ? e.status : 500

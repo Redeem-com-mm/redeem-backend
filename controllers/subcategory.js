@@ -1,5 +1,7 @@
 const db = require("../models");
 const SubCategory = db.subcategories;
+const sequelize = db.Sequelize;
+const Op = sequelize.Op;
 const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
@@ -283,6 +285,46 @@ exports.findByCategoryId = async (req, res) => {
           throw {
             status: 500,
             message: err.message || "Some error occurred while retrieving subcategories by category."
+          }
+        });
+      }
+      else{
+        throw {
+          status: 401,
+          message: "Unauthorize Resource"
+        }
+      }      
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
+//#region Retrieve all SubCategory from the database By Promotion.
+exports.findByPromotion = async (req, res) => {  
+  try{
+      let decoded = await Authentication.JwtVerify(req.headers.authorization);
+      if (!decoded) throw {
+            status: 401,
+            message: "Provide Valid JWT Token"
+      }
+
+      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+      const currentRole = await roles.findOne(decodedToken.userRole);
+
+      if(currentRole != null && (currentRole.name === "user" || currentRole.name === "admin")){
+        await SubCategory.findAll({where : {price : { [Op.gt] : sequelize.col('sale_price')} }})
+        .then(data => {
+          res.send(data);
+        })
+        .catch(err => {
+          throw {
+            status: 500,
+            message: err.message || "Some error occurred while retrieving subcategories by promotion."
           }
         });
       }

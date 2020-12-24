@@ -264,6 +264,54 @@ exports.delete = async (req, res) => {
 };
 //#endregion
 
+//#region Retrieve all Users from the database.
+exports.getUserStatus = async (req, res) => {  
+  try{
+      if(!req.params.phone_no) throw {
+        status: 400,
+        message: "Phone No is required!"
+      }
+      const phoneNo = req.params.phone_no;
+
+      const decryptedPhoneNo = Authentication.CryptoDecrypt(phoneNo);
+
+      if(!decryptedPhoneNo){
+          throw {
+              status: 401,
+              message: "Unauthorize Resource"
+          }
+      }
+
+      await User.findAll({where : {phone_no : phoneNo}})
+        .then(data => {
+          if(data != null && data.length > 0){
+            res.send({
+              firstTimeLogin : false,
+              is_active : data[0].is_active
+            });
+          }
+          else{
+            res.send({
+              firstTimeLogin : true
+            });
+          }
+        })
+        .catch(err => {
+          throw {
+            status: 500,
+            message: err.message || "Some error occurred while checking users."
+          }
+        });     
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
 // Delete all Users from the database.
 exports.deleteAll = (req, res) => {
   

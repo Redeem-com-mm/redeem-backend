@@ -1,6 +1,5 @@
 const db = require("../models");
 const Role = db.roles;
-const Op = db.Sequelize.Op;
 const { v4: uuidv4 } = require('uuid');
 const Authentication = require('../services/authentication.js');
 
