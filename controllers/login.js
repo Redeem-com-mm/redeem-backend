@@ -22,10 +22,15 @@ exports.login = async (req, res) => {
 
       if(user[0].is_active){
         const token = await Authentication.JwtSign({ user_id: user[0].id, userRole: user[0].role_id });
+        res.cookie('t', token, {expire: new Date() + 9999});
         res.send({
             token : token,
-            name : user[0].name,
-            id : user[0].id,
+            user: {
+              name : user[0].name,
+              id : user[0].id,
+              role: user[0].role_id
+            }
+            
         });
       }
       else{
@@ -83,4 +88,9 @@ exports.socialLogin = async (req, res) => {
     })
   }    
 };
+
+exports.signout = (req, res ) => {
+  res.clearCookie("t")
+  res.json({message: 'Signout successful'});
+}
 //#endregion

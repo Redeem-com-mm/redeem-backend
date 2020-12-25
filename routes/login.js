@@ -5,6 +5,7 @@ module.exports = app => {
 
     router.post("/login", logins.login);
     router.get("/sociallogin/:social_id", logins.socialLogin);
+    router.get("/logout", logins.signout);
 
     app.use('/api', router);
   };
