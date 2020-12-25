@@ -42,13 +42,16 @@ exports.create = async (req, res) => {
     user.id = uuidv4();
     user.is_active = true;
     const encryptPassword = Authentication.CryptoEncrypt(req.body.password);
-    user.password = encryptPassword;
+    user.password = encryptPassword;    
+    user.created_date = Date.now();
     user.updated_date = Date.now();
 
     // Save user in the database
     await User.create(user)
       .then(data => {
-        res.send(data);
+        res.send({
+          message : "Register is successfully completed."
+        });
       })
       .catch(err => {
         throw {
@@ -264,14 +267,14 @@ exports.delete = async (req, res) => {
 };
 //#endregion
 
-//#region Retrieve all Users from the database.
+//#region Retrieve User Status from the database.
 exports.getUserStatus = async (req, res) => {  
   try{
-      if(!req.params.phone_no) throw {
+      if(!req.body.phone_no) throw {
         status: 400,
         message: "Phone No is required!"
       }
-      const phoneNo = req.params.phone_no;
+      const phoneNo = req.body.phone_no;
 
       const decryptedPhoneNo = Authentication.CryptoDecrypt(phoneNo);
 

@@ -1,5 +1,6 @@
 const db = require("../models");
 const User = db.users;
+const Role = db.roles;
 const Authentication = require('../services/authentication.js');
 
 //#region Normal Login
@@ -13,7 +14,13 @@ exports.login = async (req, res) => {
       const phone_no = req.body.phone_no;
       const password = req.body.password;
       var condition = { phone_no: phone_no, password : password };
-      const user = await User.findAll({ where: condition });
+      const user = await User.findAll({ 
+        include: [{
+          model: Role,
+          as : "Role" // specifies how we want to be able to access our joined rows on the returned data
+        }],
+        where: condition 
+      });
 
       if(user === null || user.length <= 0)throw {
           status: 400,
@@ -21,6 +28,14 @@ exports.login = async (req, res) => {
       }
 
       if(user[0].is_active){
+        var loginUser = {};
+        loginUser.login_count = user[0].login_count + 1;
+        loginUser.lastlogin_date = Date.now();
+    
+        await User.update(loginUser, {
+          where : {id : user[0].id}
+        })
+
         const token = await Authentication.JwtSign({ user_id: user[0].id, userRole: user[0].role_id });
         res.cookie('t', token, {expire: new Date() + 9999});
         res.send({
@@ -28,9 +43,9 @@ exports.login = async (req, res) => {
             user: {
               name : user[0].name,
               id : user[0].id,
-              role: user[0].role_id
-            }
-            
+              email : user[0].email,
+              role: user[0].Role.name
+            }            
         });
       }
       else{
@@ -56,16 +71,35 @@ exports.socialLogin = async (req, res) => {
       status : 400,
       message : "Social Id is required!"
     }
-    const user = await User.findAll({ where: {social_id : req.params.social_id} });
+    const user = await User.findAll({ 
+      include: [{
+        model: Role,
+        as : "Role" // specifies how we want to be able to access our joined rows on the returned data
+      }],
+      where: {social_id : req.params.social_id} 
+    });
 
     if(user != null && user.length > 0){
       if(user[0].is_active){
+        var loginUser = {};
+        loginUser.login_count = user[0].login_count + 1;
+        loginUser.lastlogin_date = Date.now();
+    
+        await User.update(loginUser, {
+          where : {id : user[0].id}
+        })
+
         const token = await Authentication.JwtSign({ user_id: user[0].id, userRole: user[0].role_id });
+        res.cookie('t', token, {expire: new Date() + 9999});
         res.send({
-          firstTimeLogin : false,
-          name : user[0].name,
-          id : user[0].id,
-          token : token
+          firstTimeLogin : false,           
+          token : token,
+          user: {
+            name : user[0].name,
+            id : user[0].id,
+            email : user[0].email,
+            role: user[0].Role.name
+          }
         });
       }
       else{
@@ -90,7 +124,7 @@ exports.socialLogin = async (req, res) => {
 };
 
 exports.signout = (req, res ) => {
-  res.clearCookie("t")
+  res.clearCookie("t");
   res.json({message: 'Signout successful'});
 }
 //#endregion

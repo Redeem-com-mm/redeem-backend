@@ -33,6 +33,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false
       },
+      login_count: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue : 0
+      },
+      lastlogin_date: {
+        type: Sequelize.DATE
+      },
       role_id: {
         type: Sequelize.UUID,
         allowNull: false
@@ -43,9 +51,14 @@ module.exports = (sequelize, Sequelize) => {
       is_active: {
         type: Sequelize.BOOLEAN,
         defaultValue : true
+      },      
+      created_date: {
+        type : Sequelize.DATE,        
+        allowNull: false
       },
       updated_date: {
-        type : Sequelize.DATE
+        type : Sequelize.DATE,        
+        allowNull: false
       }
     }, {
       timestamps: false

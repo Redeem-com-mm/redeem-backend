@@ -7,7 +7,7 @@ module.exports = app => {
     router.post("/", users.create);
 
     // Retrieve all Users
-    router.get("/getstatus/:phone_no", users.getUserStatus);
+    router.post("/checkstatus", users.getUserStatus);
   
     // Retrieve all Users
     router.get("/", users.findAll);
