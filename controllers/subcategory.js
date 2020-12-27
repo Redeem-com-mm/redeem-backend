@@ -1,10 +1,13 @@
 const db = require("../models");
 const SubCategory = db.subcategories;
+const Category = db.categories;
+const Product = db.products;
 const sequelize = db.Sequelize;
 const Op = sequelize.Op;
 const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
+const product = require("../models/product");
 
 //#region create SubCategory
 exports.create = async (req, res) => {
@@ -317,7 +320,22 @@ exports.findByPromotion = async (req, res) => {
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && (currentRole.name === "user" || currentRole.name === "admin")){
-        await SubCategory.findAll({where : {price : { [Op.gt] : sequelize.col('sale_price')} }})
+        await SubCategory.findAll({
+          include : [
+            {
+              model: Category,
+              as : "Category",
+              include : [
+                {
+                  model : Product,
+                  as : "Product",
+                  where : {is_active : true}
+                }
+              ]
+            }
+          ],
+          where : {price : { [Op.gt] : sequelize.col('sale_price')}}
+        })
         .then(data => {
           res.send(data);
         })

@@ -11,8 +11,7 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: false
       },
       password: {
-        type: Sequelize.STRING,
-        allowNull: false
+        type: Sequelize.STRING
       },
       email: {
         type: Sequelize.STRING
@@ -20,6 +19,9 @@ module.exports = (sequelize, Sequelize) => {
       phone_no: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      photo_url: {
+        type: Sequelize.STRING
       },
       address: {
         type: Sequelize.STRING,

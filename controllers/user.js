@@ -8,9 +8,10 @@ const Authentication = require('../services/authentication.js');
 exports.create = async (req, res) => {
   try{
     // Validate request
-    if (!req.body.phone_no) throw {
+    if (!req.body.phone_no || !req.body.name || !req.body.address 
+      || !req.body.city || !req.body.township || (!req.body.password && !req.body.social_id )) throw {
         status: 400,
-        message: "Phone No is required!"
+        message: "Some of required parameters are empty!"
     }
 
     //Check User
@@ -129,7 +130,23 @@ exports.findOne = async (req, res) => {
 
     if(currentRole != null && (( id === decodedToken.user_id && currentRole.name === "user") 
     || currentRole.name === "admin")){      
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(id ,{attributes : [
+        'id',
+        'name',
+        'email',
+        'photo_url',
+        'phone_no',
+        'social_id',
+        'role_id',
+        'address',
+        'city',
+        'township',
+        'is_active',
+        'login_count',
+        'lastlogin_date',
+        'created_date',
+        'updated_date'
+      ]});
       res.send(user);
     }
     else{
@@ -285,7 +302,7 @@ exports.getUserStatus = async (req, res) => {
           }
       }
 
-      await User.findAll({where : {phone_no : phoneNo}})
+      await User.findAll({where : {phone_no : decryptedPhoneNo}})
         .then(data => {
           if(data != null && data.length > 0){
             res.send({

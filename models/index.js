@@ -38,5 +38,6 @@ db.fields = require("./field.js")(sequelize, Sequelize);
 db.categoryfields = require("./categoryfield.js")(sequelize, Sequelize);
 db.paymenttypes = require("./paymenttype.js")(sequelize, Sequelize);
 db.producttypepayments = require("./producttypepayment.js")(sequelize, Sequelize);
+db.sliders = require("./slider.js")(sequelize, Sequelize);
 
 module.exports = db;

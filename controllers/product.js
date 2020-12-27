@@ -73,7 +73,7 @@ exports.findAll = async (req, res) => {
         const currentRole = await roles.findOne(decodedToken.userRole);
   
         if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){
-          await Product.findAll()
+          await Product.findAll({where : {is_active : true}})
           .then(data => {
             res.send(data);
           })
@@ -109,13 +109,25 @@ exports.findAndCountAll = async (req, res) => {
             message: "Provide Valid JWT Token"
       }
 
+      if(!req.params.page || !req.params.size) throw {
+        status: 400,
+        message: "Required Fields are not found"
+      }
+
+      let size = req.params.size;
+      let page = req.params.page;
+
+      if(Number(page) === 1){
+        page = 0;
+      }
+
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);
 
-      if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){
+      if(currentRole != null && (currentRole.name === "admin")){
         await Product.findAndCountAll({
-          offset : req.params.page * req.params.size,
-          limit : req.params.size, 
+          offset : page * size,
+          limit : size, 
           // Add order conditions here....
           order: [
               ['updated_date', 'DESC']
