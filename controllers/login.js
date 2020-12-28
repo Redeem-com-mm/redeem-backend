@@ -67,7 +67,7 @@ exports.login = async (req, res) => {
 //#region Social Login
 exports.socialLogin = async (req, res) => {
   try{
-    if(!req.params.social_id) throw{
+    if(!req.body.social_id) throw{
       status : 400,
       message : "Social Id is required!"
     }
@@ -76,7 +76,7 @@ exports.socialLogin = async (req, res) => {
         model: Role,
         as : "Role" // specifies how we want to be able to access our joined rows on the returned data
       }],
-      where: {social_id : req.params.social_id} 
+      where: {social_id : req.body.social_id} 
     });
 
     if(user != null && user.length > 0){
