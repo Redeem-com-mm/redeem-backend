@@ -1,11 +1,18 @@
 const express = require("express");
+//var cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 const cors = require("cors");
+//var csrf = require('csurf')
 //const morgan = require('morgan');
 const morganBody = require('morgan-body');
 require('dotenv').config();
 
 const app = express();
+
+// parse cookies
+// we need this because "cookie" is true in csrfProtection
+//app.use(cookieParser());
+//app.use(csrf({ cookie: true }));
 
 const db = require("./models");
 db.sequelize.sync();
@@ -26,11 +33,14 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to ecommerce application." });
-});
+// error handler
+/* app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err)
 
+  // handle CSRF token errors here
+  res.status(403)
+  res.send('Form Error')
+}) */
 
 require("./routes/role")(app);
 require("./routes/user")(app);
@@ -45,6 +55,8 @@ require("./routes/field")(app);
 require("./routes/categoryfield")(app);
 require("./routes/paymenttype")(app);
 require("./routes/producttypepayment")(app);
+require("./routes/slider")(app);
+require("./routes/fileupload")(app);
 
 
 // set port, listen for requests
