@@ -12,6 +12,7 @@ exports.upload = async(req, res) => {
         const singleUpload = fileServices.fields([{ name: 'file', maxCount: 1 }])
         
         await singleUpload(req, res, function (err) {
+            console.log(req);
             console.log(req.files)
             
             if(!req.body.id || !req.body.file_category || !req.files.file){

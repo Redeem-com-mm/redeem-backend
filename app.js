@@ -55,7 +55,7 @@ require("./routes/field")(app);
 require("./routes/categoryfield")(app);
 require("./routes/paymenttype")(app);
 require("./routes/producttypepayment")(app);
-require("./routes/slider")(app);
+//require("./routes/slider")(app);
 require("./routes/fileupload")(app);
 
 

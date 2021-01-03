@@ -34,6 +34,8 @@ exports.create = async (req, res) => {
             .then(data => {
                 console.log("Created Data : " + data);
                 res.send({
+                    id: data.id,
+                    product_type_id:data.product_type_id,
                     message : "Product is created!"
                 });
             })
