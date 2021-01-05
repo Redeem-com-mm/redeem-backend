@@ -1,8 +1,157 @@
 const db = require("../models");
 const Category = db.categories;
+const sequelize = db.sequelize;
+const Sequelize = db.Sequelize;
+const SubCategory = db.subcategories;
+const Redeem = db.redeems;
+const Field = db.fields;
 const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
+const field = require("../models/field");
+
+//#region create Category with child table
+exports.createwithchild = async (req, res) => {
+  try{
+      let decoded = await Authentication.JwtVerify(req.headers.authorization);
+      if (!decoded) throw {
+              status: 401,
+              message: "Provide Valid JWT Token"
+      }
+
+      if(!req.body.product_id && !req.body.category) throw {
+          status: 400,
+          message: "Some of required parameters are empty!"
+      }
+
+      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+      const currentRole = await roles.findOne(decodedToken.userRole);
+
+      if(currentRole != null && currentRole.name === "admin" ){
+          const category = req.body.category;
+          const product_id = req.body.product_id;
+          var responseData = {};
+          
+          const result = await sequelize.transaction({isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE}, async transaction => {
+            category.id = uuidv4();
+            category.product_id = product_id;
+            category.created_date = Date.now();            
+            category.updated_date = Date.now();
+            category.created_by = decodedToken.user_id;
+            category.updated_by = decodedToken.user_id;
+            category.subcategories = category.subcategories != null && category.subcategories.length > 0 ? category.subcategories.map(s=>{
+              var subCategory = {};
+              subCategory.id =  uuidv4();
+              subCategory.name = s.name;
+              subCategory.price = s.price;
+              subCategory.sale_price = s.sale_price;
+              subCategory.created_date = Date.now();            
+              subCategory.updated_date = Date.now();
+              subCategory.created_by = decodedToken.user_id;
+              subCategory.updated_by = decodedToken.user_id;
+              /* subCategory.redeems = s.redeems.map(r=> {
+                var redeem = {};
+
+                redeem.id =  uuidv4();
+                redeem.code = r.code;
+                redeem.created_date = Date.now();            
+                redeem.updated_date = Date.now();
+                redeem.created_by = decodedToken.user_id;
+                redeem.updated_by = decodedToken.user_id;
+
+                return redeem;
+              }); */
+
+              return subCategory;
+            }) : null;
+            category.fields = category.fields != null && category.fields.length > 0 ? category.fields.map(f=>{
+              var field = {};
+              field.id =  uuidv4();
+              field.name = f.name;
+              field.name_mm = f.name_mm;
+              field.created_date = Date.now();            
+              field.updated_date = Date.now();
+              field.created_by = decodedToken.user_id;
+              field.updated_by = decodedToken.user_id;
+
+              return field;
+            }) : null;
+
+            /* var option = category.subcategories != null ? {
+              include : [{
+                model: SubCategory,
+                include : {
+                  model : Redeem
+                } 
+              },
+              {
+                model : Field
+              }],
+              transaction
+            } : null; */
+
+            var option = null;
+
+            if(category.subcategories != null && category.fields != null){
+              option = {
+                include : [{
+                  model: SubCategory
+                },
+                {
+                  model : Field
+                }],
+                transaction 
+              };
+            }
+            else if(category.subcategories != null){
+              option = {
+                include : SubCategory,
+                transaction
+              }              
+            }
+            else if(category.fields != null){
+              option = {
+                include : Field,
+                transaction
+              }  
+            }
+
+            await Category.create(category, option).then(data => {
+              console.log("Created Data : " + data);
+              responseData = data;
+            })
+            .catch(async err => {   
+                console.log(err); 
+                throw {
+                    status: 500,
+                    message: err.message || "Some error occurred while creating the Category."
+                }
+            });
+        });     
+        
+        console.log("Result : " + result);
+
+        res.send({
+          message : "Category is created!",
+          data : responseData
+        });
+        
+      }
+      else{
+          throw {
+              status: 401,
+              message: "Unauthorize Resource"
+            }
+      }
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+    res.status(status).json({
+        error: e.message
+    })
+  }    
+}
+//#endregion
 
 //#region create Category
 exports.create = async (req, res) => {
