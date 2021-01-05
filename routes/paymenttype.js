@@ -8,6 +8,9 @@ module.exports = app => {
 
     // Retrieve all Payments Types
     router.get("/", paymenttypes.findAll);
+
+    // Retrieve all Payments Types By Client
+    router.get("/byclient", paymenttypes.findAllByClient);
   
     // Retrieve a single Payment Type with id
     router.get("/:id", paymenttypes.findOne);
