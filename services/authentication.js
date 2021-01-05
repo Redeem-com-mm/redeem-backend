@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 const key = process.env.crypto_key;
 const iv = process.env.crypto_iv;
-const JWT_EXPIRATION_TIME = '60m';
+const JWT_EXPIRATION_TIME = process.env.token_expire;
 
 async function JwtVerify(token) {
     try {

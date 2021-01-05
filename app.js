@@ -1,4 +1,5 @@
 const express = require("express");
+var path = require('path');
 //var cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -23,6 +24,10 @@ db.sequelize.sync();
 
 //app.use(cors(corsOptions));
 //app.use(morgan('dev'));
+
+console.log('Dir : ' + __dirname);
+
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 app.use(cors());
 morganBody(app);
@@ -58,6 +63,9 @@ require("./routes/producttypepayment")(app);
 //require("./routes/slider")(app);
 require("./routes/fileupload")(app);
 
+app.get('/', function(req, res, next) {
+  res.end('Home page');
+});
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

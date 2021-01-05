@@ -4,6 +4,9 @@ module.exports = app => {
     var router = require("express").Router();
   
     // create Category
+    router.post("/all", categories.createwithchild);
+
+    // create Category
     router.post("/", categories.create);
 
     // Retrieve all Categories

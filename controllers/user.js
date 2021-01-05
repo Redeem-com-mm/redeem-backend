@@ -306,7 +306,6 @@ exports.getUserStatus = async (req, res) => {
         .then(data => {
           if(data != null && data.length > 0){
             res.send({
-              id : data[0].id,
               firstTimeLogin : false,
               is_active : data[0].is_active
             });
