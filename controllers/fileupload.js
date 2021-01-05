@@ -1,5 +1,7 @@
 const fileServices = require('../services/fileUpload');
 const Authentication = require('../services/authentication.js');
+require('dotenv').config();
+const basePath = process.env.base_path;
 
 exports.upload = async(req, res) => {
     try{
@@ -34,12 +36,16 @@ exports.upload = async(req, res) => {
                         })
                     }
                 }
-                else{    
+                else
+                {    
                     var fileExt = req.files.file[0].mimetype === "image/jpeg"? ".jpg" : ".png"
-                    
+                    //var filePath = req.files.file[0].path;
+                    //console.log("file path : " + filePath);
+
                     res.status(200).json({
                         message: "File uploaded successfully.",
-                        file_name : req.body.id + fileExt
+                        file_name : "/" + basePath + "/" + req.body.file_category + "/" + req.body.id + fileExt
+                        //file_name : ""+ filePath
                     })
                 }  
             }          
