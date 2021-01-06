@@ -11,13 +11,13 @@ exports.upload = async(req, res) => {
                 message: "Provide Valid JWT Token"
         }
 
-        const singleUpload = fileServices.fields([{ name: 'file', maxCount: 1 }])
+        const singleUpload = fileServices.single('file')
         
         await singleUpload(req, res, function (err) {
-            console.log(req);
-            console.log(req.files)
+            //console.log(req);
+            console.log(req.file)
             
-            if(!req.body.id || !req.body.file_category || !req.files.file){
+            if(!req.body.id || !req.body.file_category || !req.file){
                 res.status(400).json({
                     message: "Some of required parameters are empty!"
                 })
@@ -38,7 +38,7 @@ exports.upload = async(req, res) => {
                 }
                 else
                 {    
-                    var fileExt = req.files.file[0].mimetype === "image/jpeg"? ".jpg" : ".png"
+                    var fileExt = req.file.mimetype === "image/jpeg"? ".jpg" : ".png"
                     //var filePath = req.files.file[0].path;
                     //console.log("file path : " + filePath);
 
