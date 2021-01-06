@@ -1,6 +1,8 @@
 const db = require("../models");
 const Product = db.products;
 const Category = db.categories;
+const Redeem = db.redeems;
+const Field = db.fields;
 const SubCategory = db.subcategories;
 const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
@@ -74,6 +76,12 @@ exports.findAll = async (req, res) => {
             include : [
               {
                 model : SubCategory,
+                include : {
+                  model : Redeem
+                }
+              },
+              {
+                model : Field
               }
             ]
           }
@@ -129,14 +137,20 @@ exports.findAndCountAll = async (req, res) => {
           order: [
               ['updated_date', 'DESC']
           ],
-            include : {
-              model : Category,
-              include : [
-                {
-                  model : SubCategory,
+          include : {
+            model : Category,
+            include : [
+              {
+                model : SubCategory,
+                include : {
+                  model : Redeem
                 }
-              ]
-            }
+              },
+              {
+                model : Field
+              }
+            ]
+          }
         })
         .then(data => {
           res.send(data);
@@ -200,6 +214,59 @@ exports.findOne = async (req, res) => {
       });
     }  
   };
+//#endregion
+
+//#region  Find a single Product with child by an id 
+exports.findOneWithChild = async (req, res) => {
+  try{
+    let decoded = await Authentication.JwtVerify(req.headers.authorization);
+    if (!decoded) throw {
+          status: 401,
+          message: "Provide Valid JWT Token"
+    }
+
+    if(!req.params.id) throw {
+      status: 400,
+      message: "Param Id Not Found"
+    }
+
+    const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+    const currentRole = await roles.findOne(decodedToken.userRole);
+    const id = req.params.id;
+
+    if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){      
+      const product = await Product.findByPk(id,{
+        include : {
+          model : Category,
+          include : [
+            {
+              model : SubCategory,
+              include : {
+                model : Redeem
+              }
+            },
+            {
+              model : Field
+            }
+          ]
+        }
+      });
+      res.send(product);
+    }
+    else{
+      throw {
+        status: 401,
+        message: "Unauthorize Resource"
+      }
+    }    
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+    res.status(status).json({
+        error: e.message || "Some error occurred while retrieving product."
+    });
+  }  
+};
 //#endregion
 
 //#region  Update a Product by the id in the request
