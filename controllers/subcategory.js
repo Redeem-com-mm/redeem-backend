@@ -310,48 +310,31 @@ exports.findByCategoryId = async (req, res) => {
 //#region Retrieve all SubCategory from the database By Promotion.
 exports.findByPromotion = async (req, res) => {  
   try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
-      if (!decoded) throw {
-            status: 401,
-            message: "Provide Valid JWT Token"
-      }
-
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
-
-      if(currentRole != null && (currentRole.name === "user" || currentRole.name === "admin")){
-        await SubCategory.findAll({
-          include : [
-            {
-              model: Category,
-              as : "Category",
-              include : [
-                {
-                  model : Product,
-                  as : "Product",
-                  where : {is_active : true}
-                }
-              ]
-            }
-          ],
-          where : {price : { [Op.gt] : sequelize.col('sale_price')}}
-        })
-        .then(data => {
-          res.send(data);
-        })
-        .catch(err => {
-          throw {
-            status: 500,
-            message: err.message || "Some error occurred while retrieving subcategories by promotion."
+      await SubCategory.findAll({
+        include : [
+          {
+            model: Category,
+            as : "Category",
+            include : [
+              {
+                model : Product,
+                as : "Product",
+                where : {is_active : true}
+              }
+            ]
           }
-        });
-      }
-      else{
+        ],
+        where : {price : { [Op.gt] : sequelize.col('sale_price')}}
+      })
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
         throw {
-          status: 401,
-          message: "Unauthorize Resource"
+          status: 500,
+          message: err.message || "Some error occurred while retrieving subcategories by promotion."
         }
-      }      
+      });      
     }
     catch(e){
       let status = e.status ? e.status : 500
