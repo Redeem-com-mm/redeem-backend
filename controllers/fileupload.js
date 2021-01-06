@@ -2,6 +2,7 @@ const fileServices = require('../services/fileUpload');
 const Authentication = require('../services/authentication.js');
 require('dotenv').config();
 const basePath = process.env.base_path;
+const maxSize  = process.env.max_size;
 
 exports.upload = async(req, res) => {
     try{
@@ -17,7 +18,7 @@ exports.upload = async(req, res) => {
             //console.log(req);
             console.log(req.file)
             
-            if(!req.body.id || !req.body.file_category || !req.file){
+            if(!req.body.id || !req.body.file_category){
                 res.status(400).json({
                     message: "Some of required parameters are empty!"
                 })
@@ -28,6 +29,11 @@ exports.upload = async(req, res) => {
                     if (err.message === "Invalid File Type") {
                         res.status(400).json({
                             message: err.message
+                        })
+                    }
+                    else if(err.code === "LIMIT_FILE_SIZE"){
+                        res.status(500).json({
+                            message: "Your file size is large. Accepted file size is " + maxSize + " bytes."
                         })
                     }
                     else {
