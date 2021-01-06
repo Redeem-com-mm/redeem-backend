@@ -77,9 +77,7 @@ exports.findAll = async (req, res) => {
         let size = req.params.size;
         let page = req.params.page;
 
-        if(Number(page) === 1){
-          page = 0;
-        }
+        page = Number(page) - 1;
 
         await Product.findAndCountAll({
           where : {is_active : true},
@@ -138,9 +136,7 @@ exports.findAndCountAll = async (req, res) => {
       let size = req.params.size;
       let page = req.params.page;
 
-      if(Number(page) === 1){
-        page = 0;
-      }
+      page = Number(page) - 1;
 
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);

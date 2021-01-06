@@ -317,9 +317,7 @@ exports.findByPromotion = async (req, res) => {
       let size = req.params.size;
       let page = req.params.page;
 
-      if(Number(page) === 1){
-        page = 0;
-      }
+      page = Number(page) - 1;
 
       await SubCategory.findAndCountAll({
         offset : page * size,
