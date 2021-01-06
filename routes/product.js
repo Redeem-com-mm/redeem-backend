@@ -7,7 +7,7 @@ module.exports = app => {
     router.post("/", products.create);
 
     // Retrieve all Products
-    router.get("/", products.findAll);
+    router.get("/client/:page/:size", products.findAll);
 
     // Retrieve all Products with Pagination
     router.get("/:page/:size", products.findAndCountAll);

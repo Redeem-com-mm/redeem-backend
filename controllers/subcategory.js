@@ -310,7 +310,25 @@ exports.findByCategoryId = async (req, res) => {
 //#region Retrieve all SubCategory from the database By Promotion.
 exports.findByPromotion = async (req, res) => {  
   try{
-      await SubCategory.findAll({
+      if(!req.params.page || !req.params.size) throw {
+        status: 400,
+        message: "Required Fields are not found"
+      }
+      let size = req.params.size;
+      let page = req.params.page;
+
+      if(Number(page) === 1){
+        page = 0;
+      }
+
+      await SubCategory.findAndCountAll({
+        offset : page * size,
+        limit : size,
+        distinct : true, 
+        // Add order conditions here....
+        order: [
+            ['updated_date', 'DESC']
+        ],
         include : [
           {
             model: Category,

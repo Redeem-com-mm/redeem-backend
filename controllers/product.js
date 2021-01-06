@@ -66,19 +66,35 @@ exports.create = async (req, res) => {
 }
 //#endregion
 
-//#region Retrieve all Product from the database.
+//#region Retrieve all Product from the database with Pagination.
 exports.findAll = async (req, res) => {  
     try{
-        await Product.findAll({
+        if(!req.params.page || !req.params.size) throw {
+          status: 400,
+          message: "Required Fields are not found"
+        }
+
+        let size = req.params.size;
+        let page = req.params.page;
+
+        if(Number(page) === 1){
+          page = 0;
+        }
+
+        await Product.findAndCountAll({
           where : {is_active : true},
+          offset : page * size,
+          limit : size,
+          distinct : true, 
+          // Add order conditions here....
+          order: [
+              ['updated_date', 'DESC']
+          ],
           include : {
             model : Category,
             include : [
               {
-                model : SubCategory,
-                include : {
-                  model : Redeem
-                }
+                model : SubCategory
               },
               {
                 model : Field
@@ -132,7 +148,8 @@ exports.findAndCountAll = async (req, res) => {
       if(currentRole != null && (currentRole.name === "admin")){
         await Product.findAndCountAll({
           offset : page * size,
-          limit : size, 
+          limit : size,
+          distinct : true, 
           // Add order conditions here....
           order: [
               ['updated_date', 'DESC']
