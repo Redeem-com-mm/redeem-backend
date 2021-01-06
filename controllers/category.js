@@ -67,8 +67,8 @@ exports.createwithchild = async (req, res) => {
             category.fields = category.fields != null && category.fields.length > 0 ? category.fields.map(f=>{
               var field = {};
               field.id =  uuidv4();
-              field.name = f.name;
-              field.name_mm = f.name_mm;
+              field.name = f.label;
+              field.name_mm = f.label_mm;
               field.created_date = Date.now();            
               field.updated_date = Date.now();
               field.created_by = decodedToken.user_id;
