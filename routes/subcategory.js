@@ -22,7 +22,7 @@ module.exports = app => {
     router.get("/bycategory/:id", subcategories.findByCategoryId);
 
     // Retrieve all SubCategories By Promotion
-    router.get("/all/promotion", subcategories.findByPromotion);
+    router.get("/all/promotion/:page/:size", subcategories.findByPromotion);
 
     app.use('/api/subcategories', router);
 };
