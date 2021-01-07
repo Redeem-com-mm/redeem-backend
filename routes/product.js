@@ -13,10 +13,10 @@ module.exports = app => {
     router.get("/:page/:size", products.findAndCountAll);
   
     // Retrieve a single Product with id
-    router.get("/:id", products.findOne);
+    router.get("/:id", products.findOneForClient);
 
     // Retrieve a single Product with child by id
-    router.get("/withchild/all/:id", products.findOneWithChild);
+    router.get("/one/detail/:id", products.findOne);
   
     // Update a Product with id
     router.put("/:id", products.update);

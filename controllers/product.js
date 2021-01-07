@@ -191,8 +191,8 @@ exports.findAndCountAll = async (req, res) => {
 };
 //#endregion
 
-//#region  Find a single Product with an id
-exports.findOne = async (req, res) => {
+//#region  Find a single Product with an id For Client
+exports.findOneForClient = async (req, res) => {
     try{  
       if(!req.params.id) throw {
         status: 400,
@@ -225,8 +225,8 @@ exports.findOne = async (req, res) => {
   };
 //#endregion
 
-//#region  Find a single Product with child by an id 
-exports.findOneWithChild = async (req, res) => {
+//#region  Find a single Product with child by an id For Admin
+exports.findOne = async (req, res) => {
   try{
     let decoded = await Authentication.JwtVerify(req.headers.authorization);
     if (!decoded) throw {
@@ -243,23 +243,8 @@ exports.findOneWithChild = async (req, res) => {
     const currentRole = await roles.findOne(decodedToken.userRole);
     const id = req.params.id;
 
-    if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){      
-      const product = await Product.findByPk(id,{
-        include : {
-          model : Category,
-          include : [
-            {
-              model : SubCategory,
-              include : {
-                model : Redeem
-              }
-            },
-            {
-              model : Field
-            }
-          ]
-        }
-      });
+    if(currentRole != null && (currentRole.name === "admin")){      
+      const product = await Product.findByPk(id);
       res.send(product);
     }
     else{
