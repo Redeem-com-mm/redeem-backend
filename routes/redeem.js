@@ -3,8 +3,11 @@ module.exports = app => {
   
     var router = require("express").Router();
   
+    // create Redeems With SubCategory
+    router.post("/", redeems.createWithSubCategory);
+
     // create Redeem
-    router.post("/", redeems.create);
+    router.post("/one", redeems.create);
 
     // Retrieve all Redeems
     router.get("/", redeems.findAll);

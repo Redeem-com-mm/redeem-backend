@@ -5,6 +5,71 @@ const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
 
 //#region create Redeem
+exports.createWithSubCategory = async (req, res) => {
+  try{
+      let decoded = await Authentication.JwtVerify(req.headers.authorization);
+      if (!decoded) throw {
+              status: 401,
+              message: "Provide Valid JWT Token"
+      }
+
+      if(!req.body.redeems || !req.body.sub_category_id) throw {
+          status: 400,
+          message: "Some of required parameters are empty!"
+      }
+
+      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+      const currentRole = await roles.findOne(decodedToken.userRole);
+
+      if(currentRole != null && currentRole.name === "admin" ){
+          var redeems = req.body.redeems;
+
+          redeems = redeems.map(r => {
+            var redeem = r;
+            redeem.id = uuidv4();            
+            redeem.created_date = Date.now();            
+            redeem.updated_date = Date.now();
+            redeem.created_by = decodedToken.user_id;
+            redeem.updated_by = decodedToken.user_id;
+            redeem.sub_category_id = req.body.sub_category_id;
+
+            return redeem;
+          });
+
+          console.log("Redeems : " + redeems);
+
+          await Redeem.bulkCreate(redeems)
+          .then(data => {
+              console.log("Created Data : " + data);  
+              res.send({
+                message : "Redeems are created!",
+                data : data
+              });                
+          })
+          .catch(err => {
+              throw {
+                  status: 500,
+                  message: err.message || "Some error occurred while creating the Redeem."
+              }
+          });
+      }
+      else{
+          throw {
+              status: 401,
+              message: "Unauthorize Resource"
+            }
+      }
+  }
+  catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+  }    
+}
+//#endregion
+
+//#region create Redeem
 exports.create = async (req, res) => {
     try{
         let decoded = await Authentication.JwtVerify(req.headers.authorization);
