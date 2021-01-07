@@ -419,7 +419,14 @@ exports.findByProductId = async (req, res) => {
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && currentRole.name === "admin" ){
-        await Category.findAll({where : {product_id : id}})
+        await Category.findAll({where : {product_id : id},
+          include : {
+            model : SubCategory,
+            include : {
+              model : Redeem
+            }
+          }
+        })
         .then(data => {
           res.send(data);
         })
