@@ -66,7 +66,7 @@ exports.create = async (req, res) => {
 }
 //#endregion
 
-//#region Retrieve all Product from the database with Pagination.
+//#region Retrieve all Product For Client from the database with Pagination.
 exports.findAll = async (req, res) => {  
     try{
         if(!req.params.page || !req.params.size) throw {
@@ -193,32 +193,28 @@ exports.findAndCountAll = async (req, res) => {
 
 //#region  Find a single Product with an id
 exports.findOne = async (req, res) => {
-    try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
-      if (!decoded) throw {
-            status: 401,
-            message: "Provide Valid JWT Token"
-      }
-  
+    try{  
       if(!req.params.id) throw {
         status: 400,
         message: "Param Id Not Found"
       }
-  
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
+
       const id = req.params.id;
-  
-      if(currentRole != null && (currentRole.name === "admin" || currentRole.name === "user")){      
-        const product = await Product.findByPk(id);
-        res.send(product);
-      }
-      else{
-        throw {
-          status: 401,
-          message: "Unauthorize Resource"
+
+      const product = await Product.findByPk(id,{
+        include : {
+          model : Category,
+          include : [
+            {
+              model : SubCategory
+            },
+            {
+              model : Field
+            }
+          ]
         }
-      }    
+      });
+      res.send(product);
     }
     catch(e){
       let status = e.status ? e.status : 500

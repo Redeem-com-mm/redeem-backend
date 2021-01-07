@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
 
-//#region create Redeem
+//#region create Redeems With SubCategory
 exports.createWithSubCategory = async (req, res) => {
   try{
       let decoded = await Authentication.JwtVerify(req.headers.authorization);
@@ -26,7 +26,8 @@ exports.createWithSubCategory = async (req, res) => {
 
           redeems = redeems.map(r => {
             var redeem = r;
-            redeem.id = uuidv4();            
+            redeem.id = uuidv4();   
+            redeem.code = Authentication.CryptoEncrypt(r.code);         
             redeem.created_date = Date.now();            
             redeem.updated_date = Date.now();
             redeem.created_by = decodedToken.user_id;
@@ -93,6 +94,7 @@ exports.create = async (req, res) => {
             redeem.updated_date = Date.now();
             redeem.created_by = decodedToken.user_id;
             redeem.updated_by = decodedToken.user_id;
+            redeem.code = Authentication.CryptoEncrypt(redeem.code);
 
             await Redeem.create(redeem)
             .then(data => {
@@ -137,7 +139,10 @@ exports.findAll = async (req, res) => {
         const currentRole = await roles.findOne(decodedToken.userRole);
   
         if(currentRole != null && currentRole.name === "admin" ){
-          await Redeem.findAll()
+          await Redeem.findAll({
+            order: [
+              ['updated_date', 'DESC']
+            ]})
           .then(data => {
             res.send(data);
           })
@@ -224,6 +229,9 @@ exports.update = async (req, res) => {
         const redeem = req.body;
         redeem.updated_date = Date.now();        
         redeem.updated_by = decodedToken.user_id;
+        if(redeem.code){
+          redeem.code = Authentication.CryptoEncrypt(redeem.code);
+        }
       
         await Redeem.update(redeem, {
           where : {id : id}
@@ -335,7 +343,10 @@ exports.findBySubCategoryId = async (req, res) => {
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && currentRole.name === "admin" ){
-        await Redeem.findAll({where : {sub_category_id : id}})
+        await Redeem.findAll({where : {sub_category_id : id},
+          order: [
+            ['updated_date', 'DESC']
+          ]})
         .then(data => {
           res.send(data);
         })
@@ -383,7 +394,8 @@ exports.getCountBySubCategoryId = async (req, res) => {
       if(currentRole != null && currentRole.name === "admin" ){
         await Redeem.count({where : {
           sub_category_id : id, 
-          is_sold : false}})
+          is_sold : false}
+        })
         .then(data => {
           res.send({
             count : data
