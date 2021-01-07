@@ -9,6 +9,8 @@ const { v4: uuidv4 } = require('uuid');
 const roles = require("../controllers/role.js");
 const Authentication = require('../services/authentication.js');
 const field = require("../models/field");
+const category = require("../models/category");
+const { json } = require("body-parser");
 
 //#region create Category with child table
 exports.createwithchild = async (req, res) => {
@@ -347,9 +349,9 @@ exports.update = async (req, res) => {
 //#endregion
 
 //#region  Delete a Category with the specified id in the request
-exports.delete = async (req, res) => {
+exports.delete = (req, res) => {
     try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
+      let decoded = Authentication.JwtVerify(req.headers.authorization);
       if (!decoded) throw {
             status: 401,
             message: "Provide Valid JWT Token"
@@ -360,29 +362,123 @@ exports.delete = async (req, res) => {
       }
   
       const id = req.params.id;
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
+      const decodedToken = Authentication.JwtDecoded(req.headers.authorization);
+      const currentRole = roles.findOne(decodedToken.userRole);
   
       if(currentRole != null && currentRole.name === "admin" ){
-        await Category.destroy({where : {id : id}})
-        .then(num => {
-          if(num === 1){
-            res.send({
-                message : "Category was deleted successfully!"
-            });
+        const result = sequelize.transaction({isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE}, async transaction => {
+          const category = Category.findByPk(id, {
+            include : [
+              {
+                model : SubCategory,
+                include : {
+                  model : Redeem
+                }
+              },
+              {
+                model : Field
+              }
+            ],
+            attributes : [
+              'id'
+            ]
+          });
+
+          if(category != null){
+            if(category.fields != null && category.fields.length > 0){
+              Field.destroy({where:{id:{$in:category.fields.map(function(f){ return f.id})}},
+                transaction
+              })
+              .then(num => {
+                console.log("Field Deleted Records : " + num);
+              })
+              .catch(err => {
+                throw {
+                  status: 500,
+                  message: err.message || " Could not delete category with id=" +  id
+                }
+              })
+            }
+
+            if(category.subcategories !=  null && category.subcategories.length > 0){
+              if(category.subcategories.redeems != null && category.subcategories.redeems.length > 0){
+                category.subcategories.forEach(async subCategory => {
+                  if(subCategory.redeems != null && subCategory.redeems.length > 0){
+                    Redeem.destroy({where:{id:{$in:subCategory.redeems.map(function(r){ return r.id})}},
+                      transaction
+                    })
+                    .then(async num => {
+                      console.log("Redeem Deleted Records : " + num);
+                      SubCategory.destroy({where:{id: subCategory.id},
+                        transaction
+                      })
+                      .then(num => {
+                        console.log("SubCategory Deleted Records : " + num);
+                      })
+                      .catch(err => {
+                        throw {
+                          status: 500,
+                          message: err.message || " Could not delete category with id=" +  id
+                        }
+                      })
+                    })
+                    .catch(err => {
+                      throw {
+                        status: 500,
+                        message: err.message || " Could not delete category with id=" +  id
+                      }
+                    })
+                  }
+                  else{
+                    SubCategory.destroy({where:{id: subCategory.id},
+                      transaction
+                    })
+                    .then(num => {
+                      console.log("SubCategory Deleted Records : " + num);
+                    })
+                    .catch(err => {
+                      throw {
+                        status: 500,
+                        message: err.message || " Could not delete category with id=" +  id
+                      }
+                    })
+                  }
+                });
+              }              
+            }           
+
+            Category.destroy({where : {id : id}})
+            .then(num => {
+              if(num === 1){
+                res.send({
+                    message : "Category was deleted successfully!"
+                });
+              }
+              else{
+                  res.send({
+                      message : `Cannot delete with id= ${id}. May be Category was not found!`
+                  })
+              }
+            })
+            .catch(err => {
+              throw {
+                status: 500,
+                message: err.message || " Could not delete category with id=" +  id
+              }
+            })
           }
           else{
-              res.send({
-                  message : `Cannot delete with id= ${id}. May be Category was not found!`
-              })
+            throw {
+              status: 400,
+              message: "No record found to delete with id=" +  id
+            }
           }
-        })
-        .catch(err => {
+        }).catch(err => {
           throw {
             status: 500,
             message: err.message || " Could not delete category with id=" +  id
           }
-        })
+        });
       }
       else{
         throw {
@@ -420,12 +516,16 @@ exports.findByProductId = async (req, res) => {
 
       if(currentRole != null && currentRole.name === "admin" ){
         await Category.findAll({where : {product_id : id},
-          include : {
+          include : [{
             model : SubCategory,
             include : {
               model : Redeem
             }
+          },
+          {
+            model : Field
           }
+        ]
         })
         .then(data => {
           res.send(data);
