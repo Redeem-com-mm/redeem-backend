@@ -169,6 +169,10 @@ exports.update = async (req, res) => {
         const subcategory = req.body;
         subcategory.updated_date = Date.now();        
         subcategory.updated_by = decodedToken.user_id;
+        
+        if(!req.body.sale_price && req.body.price){
+          subCategory.sale_price = subCategory.price;
+        }
       
         await SubCategory.update(subcategory, {
           where : {id : id}
