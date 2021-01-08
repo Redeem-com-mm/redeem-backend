@@ -10,7 +10,7 @@ module.exports = app => {
     router.post("/checkstatus", users.getUserStatus);
   
     // Retrieve all Users
-    router.get("/", users.findAll);
+    router.get("/:page/:size", users.findAll);
   
     // Retrieve a single User with id
     router.get("/:id", users.findOne);

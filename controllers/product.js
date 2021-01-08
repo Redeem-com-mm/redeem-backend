@@ -1,6 +1,7 @@
 const db = require("../models");
 const Product = db.products;
 const Category = db.categories;
+const Sequelize = db.Sequelize;
 const Redeem = db.redeems;
 const Field = db.fields;
 const SubCategory = db.subcategories;
@@ -116,8 +117,19 @@ exports.findAll = async (req, res) => {
 
         page = Number(page) - 1;
 
+        console.log( "Product Type Id : "+ req.query.product_type_id);
+
+        var where = {is_active : true};
+
+        if(req.query.product_type_id){
+          where = {
+            is_active : true,
+            product_type_id : req.query.product_type_id
+          };
+        }
+
         await Product.findAndCountAll({
-          where : {is_active : true},
+          where : where,
           offset : page * size,
           limit : size,
           distinct : true, 
@@ -175,11 +187,20 @@ exports.findAndCountAll = async (req, res) => {
 
       page = Number(page) - 1;
 
+      var where = null;
+
+      if(req.query.product_type_id){
+        where = {
+          product_type_id : req.query.product_type_id
+        };
+      }      
+
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && (currentRole.name === "admin")){
         await Product.findAndCountAll({
+          where : where,
           offset : page * size,
           limit : size,
           distinct : true, 
