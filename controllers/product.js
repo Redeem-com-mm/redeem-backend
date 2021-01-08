@@ -67,6 +67,40 @@ exports.create = async (req, res) => {
 //#endregion
 
 //#region Retrieve all Product For Client from the database with Pagination.
+exports.findAllTitle = async (req, res) => {  
+  try{
+      await Product.findAll({
+        where : {is_active : true},
+        attributes : [
+          "id",
+          "name",
+          "name_mm"
+        ],
+        // Add order conditions here....
+        order: [
+            ['updated_date', 'DESC']
+        ],
+      })
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving products title."
+        }
+      });
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
+//#region Retrieve all Product For Client from the database with Pagination.
 exports.findAll = async (req, res) => {  
     try{
         if(!req.params.page || !req.params.size) throw {
