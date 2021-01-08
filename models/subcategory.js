@@ -58,7 +58,7 @@ module.exports = (sequelize, Sequelize) => {
         timestamps: false
     });
 
-    SubCategory.belongsTo(Category, {as: 'Category', foreignKey: 'category_id'}); // Adds category_id to SubCategory
+    SubCategory.belongsTo(Category, {as: 'Category', foreignKey: 'category_id', onDelete : 'CASCADE'}); // Adds category_id to SubCategory
     SubCategory.belongsTo(User, {as: 'CategoryCreatedUser', foreignKey: 'created_by'}); // Adds created_by to SubCategory
     SubCategory.belongsTo(User, {as: 'CategoryUpdatedUser', foreignKey: 'updated_by'}); // Adds updated_by to SubCategory
   

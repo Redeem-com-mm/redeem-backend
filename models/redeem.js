@@ -58,7 +58,7 @@ module.exports = (sequelize, Sequelize) => {
         timestamps: false
     });
 
-    Redeem.belongsTo(SubCategory, {as: 'SubCategory', foreignKey: 'sub_category_id'}); // Adds sub_category_id to Redeem
+    Redeem.belongsTo(SubCategory, {as: 'SubCategory', foreignKey: 'sub_category_id', onDelete : 'CASCADE'}); // Adds sub_category_id to Redeem
     Redeem.belongsTo(User, {as: 'RedeemCreatedUser', foreignKey: 'created_by'}); // Adds created_by to Redeem
     Redeem.belongsTo(User, {as: 'RedeemUpdatedUser', foreignKey: 'updated_by'}); // Adds updated_by to Redeem
   

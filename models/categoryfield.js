@@ -52,7 +52,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: false
   });
   
-  CategoryField.belongsTo(Field, {as: 'Field', foreignKey: 'field_id'}); // Adds field_id to CategoryField
+  //CategoryField.belongsTo(Field, {as: 'Field', foreignKey: 'field_id'}); // Adds field_id to CategoryField
   CategoryField.belongsTo(Category, {as: 'Category', foreignKey: 'category_id'}); // Adds category_id to CategoryField
   CategoryField.belongsTo(User, {as: 'CategoryCreatedUser', foreignKey: 'created_by'}); // Adds created_by to CategoryField
   CategoryField.belongsTo(User, {as: 'CategoryUpdatedUser', foreignKey: 'updated_by'}); // Adds updated_by to CategoryField

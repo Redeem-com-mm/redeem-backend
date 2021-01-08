@@ -423,3 +423,26 @@ exports.getCountBySubCategoryId = async (req, res) => {
     }
 };
 //#endregion
+
+//#region  Delete Multiple Redeem with the specified ids in the request
+exports.deleteRedeems = async (ids, transaction) => {
+  try{
+      await Redeem.destroy({where : {id:{[Op.in]: ids}}, transaction})
+      .then(num => {
+        return num;
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || " Could not delete redeems with ids=" +  ids
+        }
+      })
+  }
+  catch(e){
+    throw {
+      status: 500,
+      message: e.message || " Could not delete redeems with ids =" +  ids
+    }
+  }
+};
+//#endregion

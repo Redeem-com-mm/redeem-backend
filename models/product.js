@@ -27,12 +27,28 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: false
       },
-      description: {
+      category_label: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },      
+      category_label_mm: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      description_mm: {
+      sub_category_label: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },      
+      sub_category_label_mm: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      description: {
+        type: Sequelize.STRING(800),
+        allowNull: false
+      },
+      description_mm: {
+        type: Sequelize.STRING(800),
         allowNull: false
       },
       photo_url : {
@@ -40,6 +56,10 @@ module.exports = (sequelize, Sequelize) => {
         allowNull : false
       },
       is_active : {
+        type : Sequelize.BOOLEAN,
+        defaultValue : false
+      },
+      auto_pay : {
         type : Sequelize.BOOLEAN,
         defaultValue : false
       },

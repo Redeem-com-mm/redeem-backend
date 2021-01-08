@@ -50,7 +50,7 @@ module.exports = (sequelize, Sequelize) => {
         timestamps: false
     });
 
-    Category.belongsTo(Product, {as: 'Product', foreignKey: 'product_id'}); // Adds product_id to Category
+    Category.belongsTo(Product, {as: 'Product', foreignKey: 'product_id', onDelete : 'CASCADE'}); // Adds product_id to Category
     Category.belongsTo(User, {as: 'CategoryCreatedUser', foreignKey: 'created_by'}); // Adds created_by to Category
     Category.belongsTo(User, {as: 'CategoryUpdatedUser', foreignKey: 'updated_by'}); // Adds updated_by to Category
   

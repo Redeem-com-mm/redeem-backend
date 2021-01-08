@@ -18,7 +18,10 @@ exports.create = async (req, res) => {
         }
 
         if(!req.body.name || !req.body.name_mm || !req.body.description
-            || !req.body.description_mm || !req.body.weight || !req.body.photo_url || !req.body.product_type_id) throw {
+            || !req.body.description_mm || !req.body.weight
+            || !req.body.category_label || !req.body.category_label_mm
+            || !req.body.sub_category_label || !req.body.sub_category_label_mm
+            || !req.body.photo_url || !req.body.product_type_id) throw {
             status: 400,
             message: "Some of required parameters are empty!"
         }
@@ -66,7 +69,7 @@ exports.create = async (req, res) => {
 }
 //#endregion
 
-//#region Retrieve all Product For Client from the database with Pagination.
+//#region Retrieve all Product Title for Client
 exports.findAllTitle = async (req, res) => {  
   try{
       await Product.findAll({

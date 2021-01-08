@@ -40,9 +40,9 @@ db.paymenttypes = require("./paymenttype.js")(sequelize, Sequelize);
 db.producttypepayments = require("./producttypepayment.js")(sequelize, Sequelize);
 db.sliders = require("./slider.js")(sequelize, Sequelize);
 
-db.products.hasMany(db.categories, {foreignKey: 'product_id'});
-db.categories.hasMany(db.subcategories, {foreignKey: 'category_id'});
-db.categories.hasMany(db.fields, {foreignKey: 'category_id'});
-db.subcategories.hasMany(db.redeems, {foreignKey: 'sub_category_id'});
+db.products.hasMany(db.categories, {foreignKey: 'product_id', onDelete: 'cascade', hooks: true});
+db.categories.hasMany(db.subcategories, {foreignKey: 'category_id', onDelete: 'cascade', hooks: true});
+db.categories.hasMany(db.fields, {foreignKey: 'category_id' , onDelete: 'cascade', hooks: true});
+db.subcategories.hasMany(db.redeems, {foreignKey: 'sub_category_id' , onDelete: 'cascade', hooks: true});
 
 module.exports = db;
