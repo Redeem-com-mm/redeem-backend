@@ -45,6 +45,9 @@ exports.createwithchild = async (req, res) => {
               subCategory.name = s.name;
               subCategory.price = s.price;
               subCategory.sale_price = s.sale_price;
+              if(!s.sale_price){
+                subCategory.sale_price = s.price;
+              }
               subCategory.created_date = Date.now();            
               subCategory.updated_date = Date.now();
               subCategory.created_by = decodedToken.user_id;
