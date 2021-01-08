@@ -24,6 +24,10 @@ exports.create = async (req, res) => {
         if(currentRole != null && currentRole.name === "admin" ){
             const field = req.body;
             field.id = uuidv4();
+            field.created_date = Date.now();
+            field.created_by = decodedToken.user_id;
+            field.updated_date = Date.now();
+            field.updated_by = decodedToken.user_id;
 
             await Field.create(field)
             .then(data => {
