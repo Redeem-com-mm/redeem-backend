@@ -79,11 +79,37 @@ exports.findAll = async (req, res) => {
             message: "Provide Valid JWT Token"
       }
 
+      if(!req.params.page || !req.params.size) throw {
+        status: 400,
+        message: "Required Fields are not found"
+      }
+
+      let size = req.params.size;
+      let page = req.params.page;
+
+      page = Number(page) - 1;
+
+      var where = {};
+
+      if(req.query.role_id){
+        where.role_id = req.query.role_id;
+      }
+
+      if(req.query.is_active){
+        where.is_active = req.query.is_active;
+      }
+
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && currentRole.name === "admin" ){
-        await User.findAll()
+        await User.findAndCountAll({where : where,
+          offset : page * size,
+          limit : size,
+          distinct : true, 
+          order: [
+          ['updated_date', 'DESC']
+        ]})
         .then(data => {
           res.send(data);
         })
