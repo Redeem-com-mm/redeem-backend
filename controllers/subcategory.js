@@ -360,3 +360,26 @@ exports.findByPromotion = async (req, res) => {
     }
 };
 //#endregion
+
+//#region  Delete Multiple SubCategory with the specified ids in the request
+exports.deleteSubCategories = async (ids, transaction) => {
+  try{
+      await SubCategory.destroy({where : {id:{[Op.in]: ids}}, transaction})
+      .then(num => {
+        return num;
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: e.message || " Could not delete subcategories with ids=" +  ids
+        }
+      })
+  }
+  catch(e){
+    throw {
+      status: 500,
+      message: err.message || " Could not delete subcategories with ids =" +  ids
+    }
+  }
+};
+//#endregion

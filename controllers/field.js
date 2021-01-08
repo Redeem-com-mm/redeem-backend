@@ -246,3 +246,26 @@ exports.delete = async (req, res) => {
     }
   };
 //#endregion
+
+//#region  Delete Multiple Fields with the specified ids in the request
+exports.deleteFields = async (ids, transaction) => {
+  try{
+      await Field.destroy({where : {id:{[Op.in]: ids}}, transaction})
+      .then(num => {
+        return num;
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || " Could not delete fields with ids=" +  ids
+        }
+      })
+  }
+  catch(e){
+    throw {
+      status: 500,
+      message: e.message || " Could not delete fields with ids =" +  ids
+    }
+  }
+};
+//#endregion

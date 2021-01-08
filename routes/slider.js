@@ -7,7 +7,10 @@ module.exports = app => {
     router.post("/", sliders.create);
 
     // Retrieve all Sliders
-    router.get("/", sliders.findAll);
+    router.get("/:page/:size", sliders.findAll);
+
+    // Retrieve all Sliders
+    router.get("/client", sliders.findAllByClient);
   
     // Retrieve a single Slider with id
     router.get("/:id", sliders.findOne);

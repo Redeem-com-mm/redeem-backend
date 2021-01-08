@@ -18,7 +18,10 @@ exports.create = async (req, res) => {
         }
 
         if(!req.body.name || !req.body.name_mm || !req.body.description
-            || !req.body.description_mm || !req.body.weight || !req.body.photo_url || !req.body.product_type_id) throw {
+            || !req.body.description_mm || !req.body.weight
+            || !req.body.category_label || !req.body.category_label_mm
+            || !req.body.sub_category_label || !req.body.sub_category_label_mm
+            || !req.body.photo_url || !req.body.product_type_id) throw {
             status: 400,
             message: "Some of required parameters are empty!"
         }
@@ -64,6 +67,40 @@ exports.create = async (req, res) => {
         })
     }    
 }
+//#endregion
+
+//#region Retrieve all Product Title for Client
+exports.findAllTitle = async (req, res) => {  
+  try{
+      await Product.findAll({
+        where : {is_active : true},
+        attributes : [
+          "id",
+          "name",
+          "name_mm"
+        ],
+        // Add order conditions here....
+        order: [
+            ['updated_date', 'DESC']
+        ],
+      })
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving products title."
+        }
+      });
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
 //#endregion
 
 //#region Retrieve all Product For Client from the database with Pagination.

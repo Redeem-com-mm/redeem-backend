@@ -13,7 +13,7 @@ exports.create = async (req, res) => {
                 message: "Provide Valid JWT Token"
         }
 
-        if(!req.body.name || !req.body.photo_url || !req.body.destination_url) throw {
+        if(!req.body.name_mm || !req.body.name || !req.body.photo_url || !req.body.destination_url || !req.body.destination_url_mm) throw {
             status: 400,
             message: "Some of required parameters are empty!"
         }
@@ -33,7 +33,8 @@ exports.create = async (req, res) => {
             .then(data => {
                 console.log("Created Data : " + data);
                 res.send({
-                    message : "Slider is created!"
+                    message : "Slider is created!",
+                    data : data
                 });
             })
             .catch(err => {
@@ -67,12 +68,30 @@ exports.findAll = async (req, res) => {
               status: 401,
               message: "Provide Valid JWT Token"
         }
+
+        if(!req.params.page || !req.params.size) throw {
+          status: 400,
+          message: "Required Fields are not found"
+        }
+
+        let size = req.params.size;
+        let page = req.params.page;
+
+        page = Number(page) - 1;
   
         const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
         const currentRole = await roles.findOne(decodedToken.userRole);
   
         if(currentRole != null && currentRole.name === "admin" ){
-          await Slider.findAll()
+          await Slider.findAndCountAll({
+            where : {is_active : true},
+            offset : page * size,
+            limit : size,
+            distinct : true, 
+            // Add order conditions here....
+            order: [
+                ['updated_date', 'DESC']
+            ]})
           .then(data => {
             res.send(data);
           })
@@ -97,6 +116,29 @@ exports.findAll = async (req, res) => {
         })
       }
   };
+//#endregion
+
+//#region Retrieve all Slider For Client from the database.
+exports.findAllByClient = async (req, res) => {  
+  try{
+      await Slider.findAll({where : {is_active : true}})
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving sliders."
+        }
+      });      
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
 //#endregion
 
 //#region  Find a single Slider with an id

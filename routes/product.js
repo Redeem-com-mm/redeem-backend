@@ -6,7 +6,10 @@ module.exports = app => {
     // create Product
     router.post("/", products.create);
 
-    // Retrieve all Products
+    // Retrieve all Active Products Title
+    router.get("/client/titles", products.findAllTitle);
+
+    // Retrieve all Active Products
     router.get("/client/:page/:size", products.findAll);
 
     // Retrieve all Products with Pagination

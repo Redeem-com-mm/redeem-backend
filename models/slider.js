@@ -27,6 +27,10 @@ module.exports = (sequelize, Sequelize) => {
           type : Sequelize.STRING,
           allowNull : false
         },
+        destination_url_mm : {
+          type : Sequelize.STRING,
+          allowNull : false
+        },
         is_active : {
           type : Sequelize.BOOLEAN,
           defaultValue : true

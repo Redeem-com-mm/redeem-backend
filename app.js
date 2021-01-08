@@ -9,6 +9,9 @@ const morganBody = require('morgan-body');
 require('dotenv').config();
 
 const app = express();
+var http = require('http').Server(app);
+
+const io = require('socket.io')(http);
 
 // parse cookies
 // we need this because "cookie" is true in csrfProtection
@@ -60,15 +63,19 @@ require("./routes/field")(app);
 require("./routes/categoryfield")(app);
 require("./routes/paymenttype")(app);
 require("./routes/producttypepayment")(app);
-//require("./routes/slider")(app);
+require("./routes/slider")(app);
 require("./routes/fileupload")(app);
 
 app.get('/', function(req, res, next) {
   res.end('Home page');
 });
 
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
+
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
