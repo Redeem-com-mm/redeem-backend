@@ -446,6 +446,9 @@ exports.findByProductId = async (req, res) => {
 
       if(currentRole != null && currentRole.name === "admin" ){
         await Category.findAll({where : {product_id : id},
+          order: [
+            ['updated_date', 'DESC']
+          ],
           include : [{
             model : SubCategory,
             include : {
