@@ -65,6 +65,7 @@ require("./routes/paymenttype")(app);
 require("./routes/producttypepayment")(app);
 require("./routes/slider")(app);
 require("./routes/fileupload")(app);
+require("./routes/order")(app);
 
 app.get('/', function(req, res, next) {
   res.end('Home page');
