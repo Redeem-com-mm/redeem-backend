@@ -81,11 +81,11 @@ exports.findAllTitle = async (req, res) => {
           "name",
           "name_mm"
         ],
+        //group: ['product_type_id', 'id'],
         // Add order conditions here....
         order: [
-            ['updated_date', 'DESC']
-        ],
-        group: 'product_type_id'
+            ['name', 'ASC']
+        ]
       })
       .then(data => {
         res.send(data);
