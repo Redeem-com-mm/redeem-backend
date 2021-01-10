@@ -169,7 +169,7 @@ exports.update = async (req, res) => {
         const subcategory = req.body;
         subcategory.updated_date = Date.now();        
         subcategory.updated_by = decodedToken.user_id;
-        
+
         if(!req.body.sale_price && req.body.price){
           subCategory.sale_price = subCategory.price;
         }
@@ -284,7 +284,10 @@ exports.findByCategoryId = async (req, res) => {
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && currentRole.name === "admin" ){
-        await SubCategory.findAll({where : {category_id : id}})
+        await SubCategory.findAll({where : {category_id : id},
+          order: [
+            ['updated_date', 'DESC']
+          ]})
         .then(data => {
           res.send(data);
         })

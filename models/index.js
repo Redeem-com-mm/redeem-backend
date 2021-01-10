@@ -39,7 +39,10 @@ db.categoryfields = require("./categoryfield.js")(sequelize, Sequelize);
 db.paymenttypes = require("./paymenttype.js")(sequelize, Sequelize);
 db.producttypepayments = require("./producttypepayment.js")(sequelize, Sequelize);
 db.sliders = require("./slider.js")(sequelize, Sequelize);
+db.orders = require("./order.js")(sequelize, Sequelize);
+db.orderredeems = require("./orderredeems.js")(sequelize, Sequelize);
 
+db.orders.hasMany(db.orderredeems, {foreignKey: 'order_id'});
 db.products.hasMany(db.categories, {foreignKey: 'product_id', onDelete: 'cascade', hooks: true});
 db.categories.hasMany(db.subcategories, {foreignKey: 'category_id', onDelete: 'cascade', hooks: true});
 db.categories.hasMany(db.fields, {foreignKey: 'category_id' , onDelete: 'cascade', hooks: true});
