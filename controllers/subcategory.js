@@ -111,32 +111,17 @@ exports.findAll = async (req, res) => {
 
 //#region  Find a single SubCategory with an id
 exports.findOne = async (req, res) => {
-    try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
-      if (!decoded) throw {
-            status: 401,
-            message: "Provide Valid JWT Token"
-      }
-  
+    try{  
       if(!req.params.id) throw {
         status: 400,
         message: "Param Id Not Found"
       }
-  
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
+
       const id = req.params.id;
-  
-      if(currentRole != null && currentRole.name === "admin"){      
-        const subcateogry = await SubCategory.findByPk(id);
-        res.send(subcateogry);
-      }
-      else{
-        throw {
-          status: 401,
-          message: "Unauthorize Resource"
-        }
-      }    
+
+      const subcategory = await SubCategory.findByPk(id);
+      res.send(subcategory);
+      
     }
     catch(e){
       let status = e.status ? e.status : 500
