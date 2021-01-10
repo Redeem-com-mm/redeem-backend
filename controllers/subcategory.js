@@ -268,42 +268,26 @@ exports.delete = async (req, res) => {
 //#region Retrieve all SubCategory from the database By Category.
 exports.findByCategoryId = async (req, res) => {  
   try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
-      if (!decoded) throw {
-            status: 401,
-            message: "Provide Valid JWT Token"
-      }
-
       if(!req.params.id) throw {
         status: 400,
         message: "Param Id Not Found"
       }
 
       const id = req.params.id;
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
-
-      if(currentRole != null && currentRole.name === "admin" ){
-        await SubCategory.findAll({where : {category_id : id},
-          order: [
-            ['updated_date', 'DESC']
-          ]})
-        .then(data => {
-          res.send(data);
-        })
-        .catch(err => {
-          throw {
-            status: 500,
-            message: err.message || "Some error occurred while retrieving subcategories by category."
-          }
-        });
-      }
-      else{
+      
+      await SubCategory.findAll({where : {category_id : id},
+        order: [
+          ['updated_date', 'DESC']
+        ]})
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
         throw {
-          status: 401,
-          message: "Unauthorize Resource"
+          status: 500,
+          message: err.message || "Some error occurred while retrieving subcategories by category."
         }
-      }      
+      });
     }
     catch(e){
       let status = e.status ? e.status : 500

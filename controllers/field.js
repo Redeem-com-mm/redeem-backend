@@ -137,6 +137,39 @@ exports.findOne = async (req, res) => {
   };
 //#endregion
 
+//#region Retrieve all Fields from the database By Category.
+exports.findByCategoryId = async (req, res) => {  
+  try{
+      if(!req.params.id) throw {
+        status: 400,
+        message: "Param Id Not Found"
+      }
+
+      const id = req.params.id;
+      
+      await Field.findAll({where : {category_id : id},
+        order: [
+          ['updated_date', 'DESC']
+        ]})
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving fields by category."
+        }
+      });
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
 //#region  Update a Field by the id in the request
 exports.update = async (req, res) => {  
     try{

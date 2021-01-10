@@ -77,6 +77,7 @@ exports.findAllTitle = async (req, res) => {
         where : {is_active : true},
         attributes : [
           "id",
+          "product_type_id",
           "name",
           "name_mm"
         ],
@@ -84,6 +85,7 @@ exports.findAllTitle = async (req, res) => {
         order: [
             ['updated_date', 'DESC']
         ],
+        group: 'product_type_id'
       })
       .then(data => {
         res.send(data);
