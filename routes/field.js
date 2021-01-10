@@ -11,6 +11,9 @@ module.exports = app => {
   
     // Retrieve a single Field with id
     router.get("/:id", fields.findOne);
+
+    // Retrieve all Fields By Category Id
+    router.get("/bycategory/:id", fields.findByCategoryId);
   
     // Update a Field with id
     router.put("/:id", fields.update);

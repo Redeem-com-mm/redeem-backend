@@ -376,44 +376,29 @@ exports.findBySubCategoryId = async (req, res) => {
 //#region Retrieve all Redeem Count from the database By SubCategory.
 exports.getCountBySubCategoryId = async (req, res) => {  
   try{
-      let decoded = await Authentication.JwtVerify(req.headers.authorization);
-      if (!decoded) throw {
-            status: 401,
-            message: "Provide Valid JWT Token"
-      }
 
       if(!req.params.id) throw {
         status: 400,
         message: "Param Id Not Found"
       }
 
-      const id = req.params.id;
-      const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
-      const currentRole = await roles.findOne(decodedToken.userRole);
-
-      if(currentRole != null && currentRole.name === "admin" ){
-        await Redeem.count({where : {
-          sub_category_id : id, 
-          is_sold : false}
-        })
-        .then(data => {
-          res.send({
-            count : data
-          });
-        })
-        .catch(err => {
-          throw {
-            status: 500,
-            message: err.message || "Some error occurred while retrieving Redeems count by SubCategory."
-          }
+      const id = req.params.id;    
+      
+      await Redeem.count({where : {
+        sub_category_id : id, 
+        is_sold : false}
+      })
+      .then(data => {
+        res.send({
+          count : data
         });
-      }
-      else{
+      })
+      .catch(err => {
         throw {
-          status: 401,
-          message: "Unauthorize Resource"
+          status: 500,
+          message: err.message || "Some error occurred while retrieving Redeems count by SubCategory."
         }
-      }      
+      });
     }
     catch(e){
       let status = e.status ? e.status : 500
