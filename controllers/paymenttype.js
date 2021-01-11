@@ -104,6 +104,12 @@ exports.findAll = async (req, res) => {
 //#region Retrieve all Payment Type For Client from the database.
 exports.findAllByClient = async (req, res) => {  
     try{
+        let decoded = await Authentication.JwtVerify(req.headers.authorization);
+        if (!decoded) throw {
+              status: 401,
+              message: "Provide Valid JWT Token"
+        }
+        
         await PaymentType.findAll({where : {is_active : true},
           attributes : [
             'id',
