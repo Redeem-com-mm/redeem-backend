@@ -109,8 +109,15 @@ exports.findAllByClient = async (req, res) => {
               status: 401,
               message: "Provide Valid JWT Token"
         }
-        
-        await PaymentType.findAll({where : {is_active : true},
+
+        var where = {
+          is_active : true
+        };
+        if(req.query.type){
+          where.type = req.query.type;
+        }
+
+        await PaymentType.findAll({where : where,
           attributes : [
             'id',
             'name',
