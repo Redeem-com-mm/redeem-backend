@@ -153,40 +153,6 @@ exports.create = async (req, res) => {
 }
 //#endregion
 
-//#region Retrieve all Product Title for Client
-exports.findAllTitle = async (req, res) => {  
-  try{
-      await Product.findAll({
-        where : {is_active : true},
-        attributes : [
-          "id",
-          "name",
-          "name_mm"
-        ],
-        // Add order conditions here....
-        order: [
-            ['updated_date', 'DESC']
-        ],
-      })
-      .then(data => {
-        res.send(data);
-      })
-      .catch(err => {
-        throw {
-          status: 500,
-          message: err.message || "Some error occurred while retrieving products title."
-        }
-      });
-    }
-    catch(e){
-      let status = e.status ? e.status : 500
-      res.status(status).json({
-          error: e.message
-      })
-    }
-};
-//#endregion
-
 //#region Retrieve all Order For User from the database with Pagination.
 exports.findAllForUser = async (req, res) => {  
     try{
@@ -216,7 +182,11 @@ exports.findAllForUser = async (req, res) => {
           // Add order conditions here....
           order: [
               ['updated_date', 'DESC']
-          ]
+          ],
+          include :{
+            model : Product,
+            as : "Product"
+          }
         })
         .then(data => {
           res.send(data);
@@ -267,7 +237,11 @@ exports.findAllForAdmin = async (req, res) => {
           // Add order conditions here....
           order: [
               ['updated_date', 'DESC']
-          ]
+          ],
+          include :{
+            model : Product,
+            as : "Product"
+          }
         })
         .then(data => {
           res.send(data);
@@ -313,7 +287,11 @@ exports.findOneForUser = async (req, res) => {
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
 
       const order = await Order.findByPk(id,{
-        where : {user_id : decodedToken.user_id}
+          where : {user_id : decodedToken.user_id},
+          include :{
+            model : Product,
+            as : "Product"
+          }
       });
       res.send(order);
     }
@@ -345,7 +323,12 @@ exports.findOneForAdmin = async (req, res) => {
     const id = req.params.id;
 
     if(currentRole != null && (currentRole.name === "admin")){      
-      const order = await Order.findByPk(id);
+      const order = await Order.findByPk(id, {
+        include :{
+          model : Product,
+          as : "Product"
+        }
+      });
       res.send(order);
     }
     else{
