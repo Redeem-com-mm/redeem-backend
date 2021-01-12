@@ -40,7 +40,50 @@ exports.create = async (req, res) => {
         }
       });        
 
-      const order = req.body;     
+      const order = req.body;   
+      
+      if(order.udf){
+        for(var i = 0; i < order.udf.length ; i++){
+          switch(i){
+            case 0 : 
+              order.udf1 = order.udf[i].udf1;
+              break;
+            case 1 : 
+              order.udf2 = order.udf[i].udf2;
+              break;
+            case 2 : 
+              order.udf3 = order.udf[i].udf3;
+              break;
+            case 3 : 
+              order.udf4 = order.udf[i].udf4;
+              break;
+            case 4 : 
+              order.udf5 = order.udf[i].udf5;
+              break;
+            case 5 : 
+              order.udf6 = order.udf[i].udf6;
+              break;
+            case 6 : 
+              order.udf7 = order.udf[i].udf7;
+              break;
+            case 7 : 
+              order.udf8 = order.udf[i].udf8;
+              break;
+            case 8 : 
+              order.udf9 = order.udf[i].udf9;
+              break;
+            case 9 : 
+              order.udf10 = order.udf[i].udf10;
+              break;
+            default:
+              break;
+          }
+        }
+
+        order.udf = null;
+      }
+
+      console.log("Order : " + order);
 
       var qty = 1;
       var redeem_ids = [];
@@ -57,7 +100,9 @@ exports.create = async (req, res) => {
           //Need to call Payment   
         }
 
+        var generatedId = uuidv4();
         order.id = uuidv4();
+        order.order_no = generatedId.split('-')[4].toUpperCase();
         order.tran_date = Date.now();            
         order.updated_date = Date.now();
         order.user_id = decodedToken.user_id;
@@ -169,13 +214,19 @@ exports.findAllForUser = async (req, res) => {
 
         const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
 
+        var where = {user_id : decodedToken.user_id}
+
+        if(req.query.tran_status){
+          where.tran_status = req.query.tran_status;
+        }
+
         let size = req.params.size;
         let page = req.params.page;
 
         page = Number(page) - 1;
 
         await Order.findAndCountAll({
-          where : {user_id : decodedToken.user_id},
+          where : where,
           offset : page * size,
           limit : size,
           distinct : true, 
@@ -224,13 +275,20 @@ exports.findAllForAdmin = async (req, res) => {
       let size = req.params.size;
       let page = req.params.page;
 
-      page = Number(page) - 1;     
+      page = Number(page) - 1;    
+      
+      var where = {};
+
+      if(req.query.tran_status){
+        where.tran_status = req.query.tran_status;
+      }
 
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);
 
       if(currentRole != null && (currentRole.name === "admin")){
         await Order.findAndCountAll({
+          where : where,
           offset : page * size,
           limit : size,
           distinct : true, 
