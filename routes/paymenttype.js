@@ -14,6 +14,9 @@ module.exports = app => {
   
     // Retrieve a single Payment Type with id
     router.get("/:id", paymenttypes.findOne);
+
+    // Retrieve a single Payment Type with id By client
+    router.get("/byclient/:id", paymenttypes.findOneByClient);
   
     // Update a Payment Type with id
     router.put("/:id", paymenttypes.update);
