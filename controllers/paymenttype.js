@@ -185,6 +185,42 @@ exports.findOne = async (req, res) => {
   };
 //#endregion
 
+//#region  Find a single Payment Type with an id By Client
+exports.findOneByClient = async (req, res) => {
+  try{
+    let decoded = await Authentication.JwtVerify(req.headers.authorization);
+    if (!decoded) throw {
+          status: 401,
+          message: "Provide Valid JWT Token"
+    }
+
+    if(!req.params.id) throw {
+      status: 400,
+      message: "Param Id Not Found"
+    }
+    const id = req.params.id;
+
+    const type = await PaymentType.findByPk(id,{
+      attributes : [
+        'id',
+        'name',
+        'merchant_name',
+        'merchant_code',
+        'qr_url',
+        'logo_url',
+        'type'
+      ]});
+    res.send(type);  
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+    res.status(status).json({
+        error: e.message || "Some error occurred while retrieving payment type."
+    });
+  }  
+};
+//#endregion
+
 //#region  Update a Payment type by the id in the request
 exports.update = async (req, res) => {  
     try{
