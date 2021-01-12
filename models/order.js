@@ -11,6 +11,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.UUID,
             primaryKey : true
         },
+        order_no: {
+            type: Sequelize.STRING,
+            allowNull : false
+        },
         tran_id: {
             type: Sequelize.STRING
         },
@@ -118,7 +122,7 @@ module.exports = (sequelize, Sequelize) => {
         remark: {
             type: Sequelize.STRING
         },               
-        udf: {
+        udf1: {
             type: Sequelize.STRING
         },               
         udf2: {
