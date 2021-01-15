@@ -124,10 +124,11 @@ exports.findAll = async (req, res) => {
         var where = {is_active : true};
 
         if(req.query.product_type_id){
-          where = {
-            is_active : true,
-            product_type_id : req.query.product_type_id
-          };
+          where.product_type_id = req.query.product_type_id;
+        }
+
+        if(req.query.section_id){
+          where.section_id = req.query.section_id;
         }
 
         await Product.findAndCountAll({
@@ -192,10 +193,12 @@ exports.findAndCountAll = async (req, res) => {
       var where = null;
 
       if(req.query.product_type_id){
-        where = {
-          product_type_id : req.query.product_type_id
-        };
-      }      
+        where.product_type_id = req.query.product_type_id;
+      }
+
+      if(req.query.section_id){
+        where.section_id = req.query.section_id;
+      }     
 
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
       const currentRole = await roles.findOne(decodedToken.userRole);

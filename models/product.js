@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
     const ProductType = require("./producttype.js")(sequelize, Sequelize);
+    const Section = require("./section.js")(sequelize, Sequelize);
     const User = require("./user.js")(sequelize, Sequelize);
 
     const Product = sequelize.define("product", {
@@ -14,6 +15,14 @@ module.exports = (sequelize, Sequelize) => {
               key: "id"
           },
           allowNull: false
+      },
+      section_id: {
+        type: Sequelize.UUID,
+        references: {
+            model: Section,
+            key: "id"
+        },
+        allowNull: false
       },
       weight : {
         type : Sequelize.INTEGER,
@@ -91,6 +100,7 @@ module.exports = (sequelize, Sequelize) => {
         timestamps: false
     });
 
+    Product.belongsTo(Section, {as: 'Section', foreignKey: 'section_id'}); // Adds section_id to Product
     Product.belongsTo(ProductType, {as: 'ProductType', foreignKey: 'product_type_id'}); // Adds product_type_id to Product
     Product.belongsTo(User, {as: 'CreatedUser', foreignKey: 'created_by'}); // Adds created_by to Product
     Product.belongsTo(User, {as: 'UpdatedUser', foreignKey: 'updated_by'}); // Adds updated_by to Product

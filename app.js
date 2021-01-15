@@ -11,7 +11,16 @@ require('dotenv').config();
 const app = express();
 var http = require('http').Server(app);
 
-const io = require('socket.io')(http);
+const io = require('socket.io')(http, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
+
+//require('./services/notification.js').Noti(io);
 
 // parse cookies
 // we need this because "cookie" is true in csrfProtection
@@ -22,7 +31,7 @@ const db = require("./models");
 db.sequelize.sync();
 
 /* var corsOptions = {
-  origin: "http://localhost:8081"
+  origin: "http://localhost:3000"
 }; */
 
 //app.use(cors(corsOptions));
@@ -50,9 +59,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
   res.send('Form Error')
 }) */
 
+var sessionsMap = [];
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  
+  io.to(socket.id).emit('newclientconnect', { description: 'Hey, welcome!' + socket.id});
+});
+
 require("./routes/role")(app);
 require("./routes/user")(app);
-require("./routes/login")(app);
+require("./routes/login")(app, io);
 require("./routes/otp")(app);
 require("./routes/producttype")(app);
 require("./routes/product")(app);
@@ -66,13 +83,10 @@ require("./routes/producttypepayment")(app);
 require("./routes/slider")(app);
 require("./routes/fileupload")(app);
 require("./routes/order")(app);
+require("./routes/section")(app);
 
 app.get('/', function(req, res, next) {
   res.end('Home page');
-});
-
-io.on('connection', (socket) => {
-  console.log('a user connected');
 });
 
 // set port, listen for requests
