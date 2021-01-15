@@ -41,8 +41,11 @@ exports.create = async (req, res) => {
       });        
 
       const order = req.body;   
+
+      console.log(order);
       
       if(order.udf){
+        if(order.udf.length > 0){
         for(var i = 0; i < order.udf.length ; i++){
           switch(i){
             case 0 : 
@@ -79,7 +82,7 @@ exports.create = async (req, res) => {
               break;
           }
         }
-
+      }
         order.udf = null;
       }
 
