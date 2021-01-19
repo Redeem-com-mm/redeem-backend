@@ -20,7 +20,7 @@ const io = require('socket.io')(http, {
   }
 });
 
-//require('./services/notification.js').Noti(io);
+require('./services/notification.js').Noti(io);
 
 // parse cookies
 // we need this because "cookie" is true in csrfProtection
@@ -61,10 +61,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 var sessionsMap = [];
 
-io.on('connection', (socket) => {
+/* io.on('connection', (socket) => {
   console.log('a user connected');
   
-  io.to(socket.id).emit('newclientconnect', { description: 'Hey, welcome!' + socket.id});
+  io.to(socket.id).emit('newclientconnect', { description: 'Hey, welcome! ' + socket.id});
+}); */
+
+app.set('io', io);
+
+app.use(function(req, res, next) {
+  req.io = io;
+  next();
 });
 
 require("./routes/role")(app);

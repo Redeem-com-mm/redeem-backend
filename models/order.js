@@ -121,6 +121,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         remark: {
             type: Sequelize.STRING
+        },
+        admin_remark: {
+            type: Sequelize.STRING
         },               
         udf1: {
             type: Sequelize.STRING
@@ -150,6 +153,36 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         },               
         udf10: {
+            type: Sequelize.STRING
+        },               
+        label1: {
+            type: Sequelize.STRING
+        },               
+        label2: {
+            type: Sequelize.STRING
+        },               
+        label3: {
+            type: Sequelize.STRING
+        },               
+        label4: {
+            type: Sequelize.STRING
+        },               
+        label5: {
+            type: Sequelize.STRING
+        },               
+        label6: {
+            type: Sequelize.STRING
+        },               
+        label7: {
+            type: Sequelize.STRING
+        },               
+        label8: {
+            type: Sequelize.STRING
+        },               
+        label9: {
+            type: Sequelize.STRING
+        },               
+        label10: {
             type: Sequelize.STRING
         },
         updated_date : {

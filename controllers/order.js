@@ -46,44 +46,86 @@ exports.create = async (req, res) => {
       
       if(order.udf){
         if(order.udf.length > 0){
-        for(var i = 0; i < order.udf.length ; i++){
-          switch(i){
-            case 0 : 
-              order.udf1 = order.udf[i].udf1;
-              break;
-            case 1 : 
-              order.udf2 = order.udf[i].udf2;
-              break;
-            case 2 : 
-              order.udf3 = order.udf[i].udf3;
-              break;
-            case 3 : 
-              order.udf4 = order.udf[i].udf4;
-              break;
-            case 4 : 
-              order.udf5 = order.udf[i].udf5;
-              break;
-            case 5 : 
-              order.udf6 = order.udf[i].udf6;
-              break;
-            case 6 : 
-              order.udf7 = order.udf[i].udf7;
-              break;
-            case 7 : 
-              order.udf8 = order.udf[i].udf8;
-              break;
-            case 8 : 
-              order.udf9 = order.udf[i].udf9;
-              break;
-            case 9 : 
-              order.udf10 = order.udf[i].udf10;
-              break;
-            default:
-              break;
+          for(var i = 0; i < order.udf.length ; i++){
+            switch(i){
+              case 0 : 
+                order.udf1 = order.udf[i].udf1;
+                break;
+              case 1 : 
+                order.udf2 = order.udf[i].udf2;
+                break;
+              case 2 : 
+                order.udf3 = order.udf[i].udf3;
+                break;
+              case 3 : 
+                order.udf4 = order.udf[i].udf4;
+                break;
+              case 4 : 
+                order.udf5 = order.udf[i].udf5;
+                break;
+              case 5 : 
+                order.udf6 = order.udf[i].udf6;
+                break;
+              case 6 : 
+                order.udf7 = order.udf[i].udf7;
+                break;
+              case 7 : 
+                order.udf8 = order.udf[i].udf8;
+                break;
+              case 8 : 
+                order.udf9 = order.udf[i].udf9;
+                break;
+              case 9 : 
+                order.udf10 = order.udf[i].udf10;
+                break;
+              default:
+                break;
+            }
           }
         }
-      }
         order.udf = null;
+      }
+
+      if(order.label){
+        if(order.label.length > 0){
+          for(var i = 0; i < order.label.length ; i++){
+            switch(i){
+              case 0 : 
+                order.label1 = order.label[i].label1;
+                break;
+              case 1 : 
+                order.label2 = order.label[i].label2;
+                break;
+              case 2 : 
+                order.label3 = order.label[i].label3;
+                break;
+              case 3 : 
+                order.label4 = order.label[i].label4;
+                break;
+              case 4 : 
+                order.label5 = order.label[i].label5;
+                break;
+              case 5 : 
+                order.label6 = order.label[i].label6;
+                break;
+              case 6 : 
+                order.label7 = order.label[i].label7;
+                break;
+              case 7 : 
+                order.label8 = order.label[i].label8;
+                break;
+              case 8 : 
+                order.label9 = order.label[i].label9;
+                break;
+              case 9 : 
+                order.label10 = order.label[i].label10;
+                break;
+              default:
+                break;
+            }
+          }
+        }
+        order.label = null;
       }
 
       console.log("Order : " + order);

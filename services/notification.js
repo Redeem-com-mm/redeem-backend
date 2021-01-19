@@ -8,6 +8,6 @@ exports.Noti = function(io) {
 
       console.log("Socket Id in Noti : " + socket_id); 
 
-      io.to(`${socket.id}`).emit('newclientconnect', { description: 'Hey, welcome!'});
+      io.to(`${socket_id}`).emit('newclientconnect', { description: 'Hey, welcome!'});
   });
 };
