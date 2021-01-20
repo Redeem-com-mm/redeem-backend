@@ -13,7 +13,7 @@ exports.create = async (req, res) => {
                 message: "Provide Valid JWT Token"
         }
 
-        if(!req.body.name || !req.body.name_mm || !req.body.photo_url) throw {
+        if(!req.body.name || !req.body.name_mm) throw {
             status: 400,
             message: "Some of required parameters are empty!"
         }
