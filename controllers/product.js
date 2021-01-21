@@ -190,7 +190,7 @@ exports.findAndCountAll = async (req, res) => {
 
       page = Number(page) - 1;
 
-      var where = null;
+      var where = {};
 
       if(req.query.product_type_id){
         where.product_type_id = req.query.product_type_id;
