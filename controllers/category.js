@@ -367,7 +367,7 @@ exports.delete = async (req, res) => {
       const currentRole = await roles.findOne(decodedToken.userRole);
   
       if(currentRole != null && currentRole.name === "admin" ){ 
-        await Category.destroy({where : {id : id}, transaction})
+        await Category.destroy({where : {id : id}})
         .then(num => {
           if(num === 1){
             res.send({
