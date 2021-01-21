@@ -78,11 +78,10 @@ exports.findAllTitle = async (req, res) => {
         attributes : [
           "id",
           "product_type_id",
+          "section_id",
           "name",
           "name_mm"
         ],
-        //group: ['product_type_id', 'id'],
-        // Add order conditions here....
         order: [
             ['name', 'ASC']
         ]

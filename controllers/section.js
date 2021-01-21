@@ -1,5 +1,6 @@
 const db = require("../models");
 const Section = db.sections;
+const Product = db.products;
 const { v4: uuidv4 } = require('uuid');
 const roles = require("./role.js");
 const Authentication = require('../services/authentication.js');
@@ -178,6 +179,19 @@ exports.findAllByClient = async (req, res) => {
         order: [
             ['updated_date', 'DESC']
         ],
+        include : {
+          model : Product,
+          where : {is_active : true},
+          order: [
+            ['updated_date', 'DESC']
+          ],
+          attributes : [
+            'id',
+            'name',
+            'name_mm',
+            'photo_url',
+          ]
+        },
         attributes : [
           'id',
           'name',
