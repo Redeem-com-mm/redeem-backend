@@ -6,8 +6,11 @@ module.exports = app => {
     // Create a new User
     router.post("/", users.create);
 
-    // Retrieve all Users
+    // Retrieve check Users status
     router.post("/checkstatus", users.getUserStatus);
+
+    // Forgot Password
+    router.post("/forgot", users.forgotpassword);
   
     // Retrieve all Users
     router.get("/:page/:size", users.findAll);
