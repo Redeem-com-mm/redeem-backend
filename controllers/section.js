@@ -177,7 +177,7 @@ exports.findAllByClient = async (req, res) => {
       var where = {};
 
       if(req.query.section_id){
-        where.section_id = req.query.section_id;
+        where.id = req.query.section_id;
       }
 
       await Section.findAll({
