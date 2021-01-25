@@ -174,7 +174,14 @@ exports.findAll = async (req, res) => {
 //#region Retrieve all Sections By Client from the database.
 exports.findAllByClient = async (req, res) => {  
   try{
+      var where = {};
+
+      if(req.query.section_id){
+        where.section_id = req.query.section_id;
+      }
+
       await Section.findAll({
+        where : where,
         // Add order conditions here....
         order: [
             ['updated_date', 'DESC']
