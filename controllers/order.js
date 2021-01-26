@@ -394,17 +394,54 @@ exports.findOneForUser = async (req, res) => {
           include :{
             model : Product,
             as : "Product"
-          }
+          },
+          /* attributes : [
+            'id',
+          ] */
       });
       res.send(order);
     }
     catch(e){
       let status = e.status ? e.status : 500
       res.status(status).json({
-          error: e.message || "Some error occurred while retrieving product."
+          error: e.message || "Some error occurred while retrieving orders."
       });
     }  
   };
+//#endregion
+
+//#region Find Order Redeem with an id For User
+exports.findRedeemByIdForUser = async (req, res) => {
+  try{  
+    let decoded = await Authentication.JwtVerify(req.headers.authorization);
+    if (!decoded) throw {
+          status: 401,
+          message: "Provide Valid JWT Token"
+    }
+
+    if(!req.params.id) throw {
+      status: 400,
+      message: "Param Id Not Found"
+    }
+    const id = req.params.id;
+
+    const orderRedeem = await OrderRedeems.findAll({
+        where : {order_id : id},
+        include :{
+          model : Redeem,
+          as : "Redeem"
+        }
+    });
+    const redeems = orderRedeem.map(or => or.Redeem);
+    res.send(redeems);
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+    res.status(status).json({
+        error: e.message || "Some error occurred while retrieving order redeems."
+    });
+  }  
+};
 //#endregion
 
 //#region  Find a single Order by an id For Admin

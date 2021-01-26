@@ -19,6 +19,9 @@ module.exports = app => {
 
     // Retrieve a single Order For Admin by id
     router.get("/:id", orders.findOneForAdmin);
+
+    // Retrieve Order Redeems by id
+    router.get("/redeem/user/:id", orders.findRedeemByIdForUser);
   
     // Update a Order with id
     router.put("/:id", orders.update);
