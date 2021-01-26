@@ -13,7 +13,7 @@ var http = require('http').Server(app);
 
 const io = require('socket.io')(http, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://localhost:3000",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
@@ -91,6 +91,7 @@ require("./routes/slider")(app);
 require("./routes/fileupload")(app);
 require("./routes/order")(app);
 require("./routes/section")(app);
+require("./routes/page")(app);
 
 app.get('/', function(req, res, next) {
   res.end('Home page');
