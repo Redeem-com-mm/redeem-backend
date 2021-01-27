@@ -33,11 +33,15 @@ module.exports = (sequelize, Sequelize) => {
       },
       body_mm: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: false
       },
       is_active : {
         type : Sequelize.BOOLEAN,
         defaultValue : true
+      },      
+      weight : {
+        type : Sequelize.INTEGER,
+        allowNull: false
       },
       created_date : {
         type : Sequelize.DATE,

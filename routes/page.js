@@ -6,11 +6,17 @@ module.exports = app => {
     // create Page
     router.post("/", pages.create);
 
-    // Retrieve all Pages For Admin
-    router.get("/:page/:size", pages.findAll);
-
     // Retrieve all Pages For Client
     router.get("/byclient", pages.findAllByClient);
+
+    // Retrieve all Menu For Client
+    router.get("/menu", pages.findAllMenuByClient);
+
+    // Retrieve a single Page with permalink
+    router.get("/menu/:permalink", pages.findOnePage);    
+
+    // Retrieve all Pages For Admin
+    router.get("/:page/:size", pages.findAll);
   
     // Retrieve a single Page with id
     router.get("/:id", pages.findOne);

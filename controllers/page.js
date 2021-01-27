@@ -142,6 +142,64 @@ exports.findAllByClient = async (req, res) => {
 };
 //#endregion
 
+//#region Retrieve all Menu For Client from the database.
+exports.findAllMenuByClient = async (req, res) => {  
+  try{
+      await Page.findAll({
+        where : {is_active : true},
+        attributes : [
+          "id",
+          "menu",
+          "menu_mm",
+          "permalink"
+        ],
+        // Add order conditions here....
+        order: [
+            ['weight', 'ASC']
+        ]
+      })
+      .then(data => {
+        res.send(data);
+      })
+      .catch(err => {
+        throw {
+          status: 500,
+          message: err.message || "Some error occurred while retrieving menu."
+        }
+      });      
+    }
+    catch(e){
+      let status = e.status ? e.status : 500
+      res.status(status).json({
+          error: e.message
+      })
+    }
+};
+//#endregion
+
+//#region  Find a single Page with an Permalink
+exports.findOnePage = async (req, res) => {
+  try{  
+    if(!req.params.permalink) throw {
+      status: 400,
+      message: "Param Not Found"
+    }
+    const permalink = req.params.permalink;
+    
+    const pages = await Page.findAll({where : {permalink : permalink}});
+    const page = pages != null && pages.length > 0 ? pages[0] : {};
+    
+    res.send(page);
+  }
+  catch(e){
+    let status = e.status ? e.status : 500
+    res.status(status).json({
+        error: e.message || "Some error occurred while retrieving page."
+    });
+  }  
+};
+//#endregion
+
 //#region  Find a single Page with an id
 exports.findOne = async (req, res) => {
     try{  
