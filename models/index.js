@@ -43,8 +43,11 @@ db.orders = require("./order.js")(sequelize, Sequelize);
 db.orderredeems = require("./orderredeems.js")(sequelize, Sequelize);
 db.sections = require("./section.js")(sequelize, Sequelize);
 db.pages = require("./page.js")(sequelize, Sequelize);
+db.notiusers = require("./notiuser.js")(sequelize, Sequelize);
+db.notifications = require("./notification.js")(sequelize, Sequelize);
 
 db.orders.hasMany(db.orderredeems, {foreignKey: 'order_id'});
+db.orders.hasMany(db.notifications, {foreignKey: 'order_id'});
 db.sections.hasMany(db.products, {foreignKey: 'section_id'});
 db.products.hasMany(db.categories, {foreignKey: 'product_id', onDelete: 'cascade', hooks: true});
 db.categories.hasMany(db.subcategories, {foreignKey: 'category_id', onDelete: 'cascade', hooks: true});

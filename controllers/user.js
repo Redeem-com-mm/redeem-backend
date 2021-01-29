@@ -443,10 +443,20 @@ exports.getUserStatus = async (req, res) => {
 };
 //#endregion
 
-// Delete all Users from the database.
-exports.deleteAll = (req, res) => {
-  
+//#region Find a single Role with userId
+exports.findRoleByUser = async (userId) => {
+  var user = null;
+
+  try{
+    user = await User.findByPk(userId);
+  }
+  catch(err){
+      console.log(err);
+  }
+
+  return user;
 };
+//#endregion
 
 // Find all published Users
 exports.findAllPublished = (req, res) => {

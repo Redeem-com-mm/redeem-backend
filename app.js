@@ -13,11 +13,21 @@ var http = require('http').Server(app);
 
 const io = require('socket.io')(http, {
   cors: {
-    origin: "https://localhost:3000",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
+    allowedHeaders: ["x-userid"],
     credentials: true
   }
+});
+
+// middleware
+io.use((socket, next) => {
+  let clientId = socket.handshake.headers['x-userid'];
+  console.log("User Id in Middleware : " + clientId);
+  if (clientId) {
+    return next();
+  }
+  return next(new Error('authentication error'));
 });
 
 require('./services/notification.js').Noti(io);
