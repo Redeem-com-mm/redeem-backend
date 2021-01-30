@@ -8,6 +8,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.UUID,
         primaryKey : true
       },
+      noti_owner: {
+          type: Sequelize.UUID,
+          allowNull : false
+      },
       order_no: {
           type: Sequelize.STRING,
           allowNull : false

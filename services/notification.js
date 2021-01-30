@@ -12,11 +12,13 @@ exports.Noti = function(io) {
 
     const userId = socket.handshake.headers['x-userid'];
 
+    socket.join(userId);
+
     /* var deleted  = await NotiUser.destroy({ 
       where : {user_id : userId}
     }); */
 
-    console.log(`User Id is '${userId}'`);
+    /* console.log(`User Id is '${userId}'`);
     const user = await users.findRoleByUser(userId);
 
     if(user != null){
@@ -27,16 +29,18 @@ exports.Noti = function(io) {
       notiUser.socket_id = socket.id;
 
       NotiUser.create(notiUser);
-    }
+    } */
 
     socket.on("disconnect", async function(){
       // Everytime a client logs out, display a disconnected message
       console.log("Server-Client Disconnected in Noti!");
-      console.log("Socket Id in Noti Disconnecting : " + socket.id); 
+      console.log("Socket Id in Noti Disconnecting : " + socket.id);
+      
+      socket.leave(userId);
 
-      var deleted  = await NotiUser.destroy({ 
+      /* var deleted  = await NotiUser.destroy({ 
         where : {socket_id : socket.id}
-      });
+      }); */
     });
 
     /* socket.on('userId',async function (data) {

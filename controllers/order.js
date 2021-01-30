@@ -5,6 +5,7 @@ const Sequelize = db.Sequelize;
 const sequelize = db.sequelize;
 const Redeem = db.redeems;
 const OrderRedeems = db.orderredeems;
+const Notification = db.notifications;
 const Order = db.orders;
 const SubCategory = db.subcategories;
 const { v4: uuidv4 } = require('uuid');
@@ -28,6 +29,9 @@ exports.create = async (req, res) => {
       }
 
       const decodedToken = await Authentication.JwtDecoded(req.headers.authorization);
+      
+      const role = await roles.findOneByName('admin');
+      const roleObj = JSON.parse(role);
 
       const product = await Product.findByPk(req.body.product_id, {
         include : {
@@ -134,6 +138,10 @@ exports.create = async (req, res) => {
       var redeem_ids = [];
       var merchant_status = false;
 
+      if(req.body.quantity){
+        qty = req.body.quantity;
+      }
+
       if(product){
         if(!product.auto_pay){
           if(!req.body.consumer_no || !req.body.payment_slip) throw {
@@ -161,6 +169,7 @@ exports.create = async (req, res) => {
 
         const result = await sequelize.transaction({isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE}, async transaction => {
           var option = {
+            include : Notification,
             transaction
           };
 
@@ -173,10 +182,6 @@ exports.create = async (req, res) => {
                 limit : qty,
                 transaction
               });
-    
-              if(req.body.quantity){
-                qty = req.body.quantity;
-              }
     
               if(qty > redeems.count){
                 throw {
@@ -194,7 +199,14 @@ exports.create = async (req, res) => {
               redeem_ids = redeems.rows.map(r => r.id);
 
               option = {
-                include : OrderRedeems,
+                include : [
+                  {
+                    model : OrderRedeems
+                  },
+                  {
+                    model : Notification
+                  }
+                ],
                 transaction
               }
 
@@ -211,9 +223,25 @@ exports.create = async (req, res) => {
             }
           }
 
+          const noti = {
+            id : uuidv4(),
+            noti_owner : roleObj[0].id,
+            order_no : order.order_no,            
+            product_name : product.name,
+            product_name_mm : product.name_mm,
+            product_photo_url : product.photo_url,
+            order_date : order.tran_date,
+            price : order.paid_price,
+            quantity : qty
+          };
+
+          order.notifications = noti;    
+
           await Order.create(order, option)
           .then(data => {
-              console.log("Created Data : " + data);
+              console.log("Created Data : " + data);             
+              req.io.in(`${roleObj[0].id}`).emit('NewOrderSubmitted', { data: noti});
+              
               res.send({
                   id: data.id,
                   message : "Order is submitted!"
@@ -512,17 +540,46 @@ exports.update = async (req, res) => {
 
         const result = await sequelize.transaction({isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE}, async transaction => {
           const rowOrder = await Order.findByPk(id, {transaction});
+          var qty = 0;
+
+          if(order.quantity){
+            qty = order.quantity;
+          }
+          else{
+            qty = rowOrder.quantity;
+          }                
+        
+          const notis = await Notification.findAll({
+            where : {order_id : id},
+            transaction
+          });
+          
+          const noti = {}; 
+
+          noti.id = uuidv4();
+          noti.tran_status = order.tran_status;
+          noti.noti_owner = rowOrder.user_id;
+          noti.quantity = qty; 
+          noti.order_no = rowOrder.order_no;
+          noti.product_photo_url = notis[0].product_photo_url;
+          noti.product_name = rowOrder.product_name;
+          noti.product_name_mm = rowOrder.product_name_mm;
+          noti.price = notis[0].price;
+          noti.order_id = rowOrder.id;   
+
+          await Notification.create(noti, {
+            transaction
+          }).then(data => {
+            console.log("Created Data : " + data);      
+          })
+          .catch(err => {
+              throw {
+                  status: 500,
+                  message: err.message || "Some error occurred while updating the Order."
+              }
+          });
 
           if(rowOrder.product_type_id === product_redeem_id && order.tran_status && order.tran_status === "Approved"){
-            var qty = 0;
-
-            if(order.quantity){
-              qty = order.quantity;
-            }
-            else{
-              qty = rowOrder.quantity;
-            }
-
             const redeems = await Redeem.findAndCountAll({
               where : {
                 sub_category_id : rowOrder.sub_category_id, is_sold : false
@@ -568,7 +625,7 @@ exports.update = async (req, res) => {
                     message: err.message || "Some error occurred while creating the Order Redeems."
                 }
             });
-          }
+          }    
 
           await Order.update(order, {
             where : {id : id},
@@ -576,6 +633,9 @@ exports.update = async (req, res) => {
           })
           .then(num => {
             if (num == 1) {
+              // Send to all clients in 'game' room(channel) include sender
+              req.io.sockets.in(rowOrder.user_id).emit('OrderUpdate', data = noti);
+              
               res.send({
                 message: "Order was updated successfully."
               });
@@ -590,7 +650,7 @@ exports.update = async (req, res) => {
               status: 500,
               message: err.message || " Error updating Order with id=" + id
             }
-          }); 
+          });
         });
       }
       else{
