@@ -16,7 +16,7 @@ module.exports = {
   PORT: 25060,
   USER: "doadmin",
   PASSWORD: "e6em9jjlh2pyrwwr",
-  DB: "defaultdb",
+  DB: "redeem",
   dialect: "postgres",
   pool: {
     max: 5,
