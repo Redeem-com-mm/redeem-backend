@@ -2,10 +2,12 @@ const db = require("../models");
 const User = db.users;
 const Role = db.roles;
 const Authentication = require('../services/authentication.js');
+const Email = require('../services/email.js');
 
 //#region Normal Login
 exports.login = async (req, res) => {
   try{
+      await Email.sendEmail();
       // Validate request
       if (!req.body.phone_no || !req.body.password) throw {
           status: 400,
